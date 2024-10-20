@@ -11,7 +11,7 @@ import {
 
 import { useState, useEffect } from 'react';
 
-import { getUserCS } from 'firebase-nextjs/client/auth';
+/* import { getUserCS } from 'firebase-nextjs/client/auth'; */
 import { fetchUserPost } from '@/src/lib/DataServer';
 
 import useSWR from 'swr';
@@ -75,7 +75,6 @@ function Order({ orderReference }) {
 
 export default function Page() {
   const { data: user } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
-  const { currentUser } = getUserCS()
 
   const [tab, setTab] = useState(0);
   const [adminTab, setAdminTab] = useState(0);
@@ -88,8 +87,8 @@ export default function Page() {
         <Row>
           <Col xs={12} s={12} md={2} lg={2}>
             <div className='my-3'>
-              <Button active={tab === 0} onClick={e => setTab(0)} className='text-start text-secondary' block color='light'>ACCOUNT</Button>
-              <Button active={tab === 1} onClick={e => setTab(1)} className='text-start mt-2 text-secondary' block color='light'>ORDERS</Button>
+              <Button active={tab === 0} onClick={() => setTab(0)} className='text-start text-secondary' block color='light'>ACCOUNT</Button>
+              <Button active={tab === 1} onClick={() => setTab(1)} className='text-start mt-2 text-secondary' block color='light'>ORDERS</Button>
             </div>
           </Col>
           <Col xs={12} s={12} md={10} lg={10}>

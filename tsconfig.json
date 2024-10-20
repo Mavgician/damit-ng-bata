@@ -26,6 +26,6 @@
       "@/assets/*": ["./src/assets/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(standard)/layout.jsx", "src/app/layout.jsx", "src/app/page.jsx", "src/app/types.jsx", "src/app/(auth pages)/login/page.jsx", "src/app/(auth pages)/account-setup/page.jsx", "src/app/(standard)/profile/page.jsx", "src/app/(standard)/page.jsx", "src/app/(standard)/products/page.jsx", "src/app/(standard)/cart/page.jsx", "src/app/(standard)/about-us/page.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(standard)/layout.jsx", "src/app/layout.jsx", "src/app/page.jsx", "src/app/types.jsx", "src/app/(auth pages)/login/page.jsx", "src/app/(auth pages)/account-setup/page.jsx", "src/app/(standard)/profile/page.jsx", "src/app/(standard)/page.jsx", "src/app/(standard)/products/page.jsx", "src/app/(standard)/cart/page.jsx", "src/app/(standard)/about-us/page.jsx", "src/components/Navigation.jsx", "src/components/Footer.jsx"],
   "exclude": ["node_modules"]
 }

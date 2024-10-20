@@ -1,4 +1,4 @@
-import { db, auth } from '@/firebase-app-config.js'
+import { db } from '@/firebase-app-config.js'
 import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 
@@ -6,17 +6,17 @@ import { getAppSS, getUserSS } from "firebase-nextjs/server/auth";
 import { getAuth } from 'firebase-admin/auth';
 
 export async function POST(req, { params }) {
-    const url = req.nextUrl.searchParams
     const app = await getAppSS()
 
     let currentUser = await getUserSS()
-
     let body
 
     try {
         body = await req.json()
         currentUser = await getAuth(app).verifySessionCookie(body?.token)
-    } catch (error) {}
+    } catch (error) {
+        console.warn(error)
+    }
 
     if (!currentUser) {
         return NextResponse.json({ error: 'User not logged in' }, { status: 401 })

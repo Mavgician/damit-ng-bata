@@ -23,12 +23,12 @@ import { fetchUserPost } from '@/lib/DataServer';
 
 import useSWR from 'swr';
 
-function ProfilePopup({ user }: { user: any | null }) {
+function ProfilePopup({ user }) {
   const { data: firestoreUser } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
 
   const imageUrl = user?.photoURL ?? "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=" + (user?.displayName ?? user?.email);
 
-  const popupStyle: React.CSSProperties = {
+  const popupStyle = {
     width: "calc(-40px + min(100vw, 370px))",
     backgroundColor: '#fff',
     border: '1px solid #00000022',
@@ -39,7 +39,7 @@ function ProfilePopup({ user }: { user: any | null }) {
     margin: 10,
   };
 
-  const profilePopupImageStyle: React.CSSProperties = {
+  const profilePopupImageStyle = {
     borderRadius: 9999,
     height: 30,
     width: 30,
@@ -48,7 +48,7 @@ function ProfilePopup({ user }: { user: any | null }) {
     marginTop: 8,
   };
 
-  const icon: React.CSSProperties = {
+  const icon = {
     height: 15, width: 15,
     display: 'inline-flex',
     justifyContent: 'center',
@@ -111,7 +111,7 @@ function ProfilePopup({ user }: { user: any | null }) {
   </div>
 }
 
-function ProfileButtonTrigger({ user, size }: { user: any | null, size: number }) {
+function ProfileButtonTrigger({ user, size }) {
   const imageUrl = user?.photoURL ?? "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=" + (user?.displayName ?? user?.email);
   return (
     <img src={imageUrl} alt="profile" height={size} width={size} className="rounded-circle" style={{ cursor: "pointer" }} />

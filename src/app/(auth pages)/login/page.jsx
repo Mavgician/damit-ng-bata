@@ -15,11 +15,10 @@ import {
     Spinner,
 } from 'reactstrap'
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginPage() {
-    const { userLoggedIn, currentUser } = getUserCS()
+    const { currentUser } = getUserCS()
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")

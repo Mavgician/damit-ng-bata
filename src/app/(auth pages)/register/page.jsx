@@ -1,6 +1,14 @@
 'use client'
 
-import Image from 'next/image';
+export default function Page() {
+  return (
+    <main>
+      <h1>in register</h1>
+    </main>
+  );
+}
+
+/* import Image from 'next/image';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGoogle } from '@fortawesome/free-brands-svg-icons'
@@ -149,4 +157,4 @@ export default function Page() {
       </Container>
     </main>
   )
-}
+} */

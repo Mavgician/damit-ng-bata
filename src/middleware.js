@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers'
 
-import FirebaseNextJSMiddleware from 'firebase-nextjs/middleware/firebase-nextjs-middleware';
 import checkUser from 'firebase-nextjs/middleware/check-user'
 
 const options = {

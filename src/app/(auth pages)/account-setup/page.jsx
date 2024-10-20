@@ -16,7 +16,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserCS } from 'firebase-nextjs/client/auth';
 
-export default function Page({ params }) {
+export default function Page() {
   const { currentUser } = getUserCS()
 
   const [username, setUsername] = useState(currentUser.displayName);
