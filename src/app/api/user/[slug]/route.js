@@ -15,7 +15,7 @@ export async function POST(req, { params }) {
         body = await req.json()
         currentUser = await getAuth(app).verifySessionCookie(body?.token)
     } catch (error) {
-        console.warn(error)
+        console.warn('Request body is not set.')
     }
 
     if (!currentUser) {
