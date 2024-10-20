@@ -3,7 +3,7 @@
 export default function Home() {
   return (
     <main>
-      <h1>in Landing Page</h1>
+      <h1>You are not authorized to access this page.</h1>
     </main>
   );
 }

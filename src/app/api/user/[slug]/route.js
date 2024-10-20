@@ -2,13 +2,21 @@ import { db, auth } from '@/firebase-app-config.js'
 import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 
-import { getUserSS } from "firebase-nextjs/server/auth";
+import { getAppSS, getUserSS } from "firebase-nextjs/server/auth";
+import { getAuth } from 'firebase-admin/auth';
 
 export async function POST(req, { params }) {
     const url = req.nextUrl.searchParams
-    const currentUser = await getUserSS()
+    const app = await getAppSS()
 
-    console.log(currentUser);
+    let currentUser = await getUserSS()
+
+    let body
+
+    try {
+        body = await req.json()
+        currentUser = await getAuth(app).verifySessionCookie(body?.token)
+    } catch (error) {}
 
     if (!currentUser) {
         return NextResponse.json({ error: 'User not logged in' }, { status: 401 })
@@ -18,18 +26,14 @@ export async function POST(req, { params }) {
     const userDocRaw = await getDoc(document)
     const userDoc = userDocRaw.data()
 
-    const display_name = url.get('dname')
-    const first_name = url.get('fname')
-    const last_name = url.get('lname')
-
     const payload = {
         creation: Timestamp.now(),
         email: currentUser.email,
         locations: [],
         name: {
-            display: display_name,
-            first: first_name,
-            last: last_name
+            display: body?.display_name ?? null,
+            first: body?.first_name ?? null,
+            last: body?.last_name ?? null
         },
         orders: [],
         ratings: [],
@@ -45,9 +49,7 @@ export async function POST(req, { params }) {
             const updated = {
                 ...userDoc,
                 name: {
-                    display: display_name,
-                    first: first_name,
-                    last: last_name
+                    ...payload.name
                 }
             }
 

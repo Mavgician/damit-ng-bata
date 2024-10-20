@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers'
 
 import FirebaseNextJSMiddleware from 'firebase-nextjs/middleware/firebase-nextjs-middleware';
 import checkUser from 'firebase-nextjs/middleware/check-user'
@@ -10,7 +11,8 @@ const options = {
 const AUTH_PATHS = [
     "/login",
     "/register",
-    "/forgot-password"
+    "/forgot-password",
+    "/admin-dashboard"
 ]
 
 export default async function middleware(req) {
@@ -22,19 +24,27 @@ export default async function middleware(req) {
     // If user is already logged in, and tries an auth page
     // Redirect to the target page
     if (loggedIn && AUTH_PATHS.includes(path)) {
+        const cookieStore = cookies()
+        const token = cookieStore.get('firebase_nextjs_token')
+
         const target = req.nextUrl.searchParams.get('target') ?? "/";
-        const checkUserFirestore = await fetch(
+        const verifyUser = await fetch(
             new URL('/api/user/verify', req.nextUrl),
             {
                 method: 'POST',
                 body: JSON.stringify({
-                    isLogin: true
+                    isLogin: true,
+                    token: token.value
                 })
             }
         )
 
-        if (checkUserFirestore.status === 404) {
+        if (verifyUser.status === 404) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
+        }
+
+        if (path.split('/').includes('admin-dashboard') && await verifyUser.json().type !== 'admin') {
+            return NextResponse.redirect(new URL('/not-allowed', req.nextUrl));
         }
 
         return NextResponse.redirect(new URL(target, req.nextUrl));
@@ -52,7 +62,6 @@ export default async function middleware(req) {
 
     // If a regex rule is defined in allowRule, allow the path if it matches
     // Every other form of rule specification is ignored.
-
     if (rule.test(path)) {
         return NextResponse.next()
     }

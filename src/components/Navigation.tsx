@@ -1,9 +1,9 @@
 'use client';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faGear, faBox } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faGear, faBox, faShield } from '@fortawesome/free-solid-svg-icons';
 
-import { SetStateAction, useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Collapse,
   Navbar,
@@ -19,10 +19,12 @@ import { Popover } from 'react-tiny-popover';
 
 import { getUserCS } from 'firebase-nextjs/client/auth';
 import { LogoutButton } from 'firebase-nextjs/client/components';
+import { fetchUserPost } from '@/lib/DataServer';
 
-/* import { ProfileButton } from 'firebase-nextjs/client/components'; */
+import useSWR from 'swr';
 
 function ProfilePopup({ user }: { user: any | null }) {
+  const { data: firestoreUser } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
 
   const imageUrl = user?.photoURL ?? "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=" + (user?.displayName ?? user?.email);
 
@@ -47,11 +49,11 @@ function ProfilePopup({ user }: { user: any | null }) {
   };
 
   const icon: React.CSSProperties = {
-    height: 20,
+    height: 15, width: 15,
     display: 'inline-flex',
     justifyContent: 'center',
     alignContent: 'center',
-    marginRight: 20
+    marginRight: 5
   }
 
   return <div style={popupStyle}>
@@ -70,21 +72,31 @@ function ProfilePopup({ user }: { user: any | null }) {
     </div>
     <hr />
     <div className='text-uppercase text-secondary'>
+      {
+        firestoreUser.type === 'admin' ?
+          <NavLink href='/admin-dashboard' className='px-3 py-2 profilePopoverLink'>
+            <div className='profilePopoverMenu'>
+              <FontAwesomeIcon style={icon} icon={faShield} />
+            </div>
+            Admin
+          </NavLink> : 
+          null
+      }
       <NavLink href='/profile' className='px-3 py-2 profilePopoverLink'>
         <div className='profilePopoverMenu'>
-          <FontAwesomeIcon icon={faBox} />
+          <FontAwesomeIcon style={icon} icon={faBox} />
         </div>
         Orders
       </NavLink>
       <NavLink href='/profile' className='px-3 py-2 profilePopoverLink'>
         <div className='profilePopoverMenu'>
-          <FontAwesomeIcon icon={faUser} />
+          <FontAwesomeIcon style={icon} icon={faUser} />
         </div>
         Profile
       </NavLink>
       <NavLink href='/settings' className='px-3 py-2 profilePopoverLink'>
         <div className='profilePopoverMenu'>
-          <FontAwesomeIcon icon={faGear} />
+          <FontAwesomeIcon style={icon} icon={faGear} />
         </div>
         Settings
       </NavLink>
@@ -167,7 +179,7 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
           </Nav>
         </Collapse>
       </Navbar>
-      {isFixed ? <div style={{height: 70}}>&nbsp;</div> : null}
+      {isFixed ? <div style={{ height: 70 }}>&nbsp;</div> : null}
     </>
   );
 }

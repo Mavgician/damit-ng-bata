@@ -74,8 +74,7 @@ function Order({ orderReference }) {
 }
 
 export default function Page() {
-  const { data: user } = useSWR('api/user/fetch', fetchUserPost, { suspense: true })
-
+  const { data: user } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
   const { currentUser } = getUserCS()
 
   const [tab, setTab] = useState(0);

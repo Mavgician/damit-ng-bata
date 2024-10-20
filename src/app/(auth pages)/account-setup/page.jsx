@@ -28,16 +28,24 @@ export default function Page({ params }) {
   const router = useRouter()
 
   async function submitHandler() {
-    const urlparams = `api/user/update?dname=${username}&fname=${firstName}&lname=${lastName}`
-
     if (username.length <= 0 || firstName.length <= 0 || lastName.length <= 0) return setInvalid(true)
-    
-    await fetch(urlparams, {method: 'POST'})
+
     router.replace('/')
+
+    fetch(
+      'api/user/update',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          display_name: firstName,
+          last_name: lastName,
+          first_name: firstName
+        })
+      })
   }
 
   useEffect(() => {
-    fetch('api/user/new', {method: 'POST'})
+    fetch('api/user/new', { method: 'POST' })
   }, []);
 
   return (
