@@ -1,82 +1,52 @@
 'use client'
 
-import Link from 'next/link';
-
 import {
   Button,
   Container,
   Row,
-  Col
+  Col,
+  Table,
+  Input
 } from 'reactstrap'
 
-import { useState, useEffect } from 'react';
-
-/* import { getUserCS } from 'firebase-nextjs/client/auth'; */
-import { fetchUserPost } from '@/src/lib/DataServer';
-
+import { useState } from 'react';
 import useSWR from 'swr';
-import Image from 'next/image';
+import { Timestamp } from 'firebase/firestore';
 
-function Order({ orderReference }) {
-  const [order, setOrder] = useState({
-    seat: {
-      type: 'seatType',
-      location_index: [],
-      type_index: 0
-    },
-    claim_type: 'claimType',
-    date: undefined
-  });
-  const [ticket, setTicket] = useState({
-    title: 'ticketTitle',
-    poster_image_url: '',
-    seat: [
-      { price: 0 }
-    ]
-  });
-  const [ID, setID] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    (async () => {
-      const ref = await getDoc(orderReference)
-      setOrder(ref.data())
-      setTicket((await getDoc(ref.data().ticket_ref)).data())
-      setID(ref.data().ticket_ref.id)
-      setLoading(false)
-    })()
-  }, []);
-
-  return (
-    !loading &&
-    <Link href={`/tickets/${ID}`} className='bg-light text-dark rounded p-3 border d-block mb-3 text-decoration-none'>
-      <Row>
-        <Col xs={1} sm={1} md={1} lg={1}>
-          <Image src={ticket.poster_image_url} height={0} width={0} sizes='100%' style={{ height: 'auto', width: '100%' }} />
-        </Col>
-        <Col xs={11} sm={11} md={11} lg={11}>
-          <h3 className='m-0'>{ticket.title}</h3>
-          <div className='d-flex mb-2'>
-            <p className='m-0 me-3'>Price: PHP {ticket.seat[order.seat.type_index].price}</p>
-            <p className='m-0 me-3'>Seat: {order.seat.type} - {order.seat.location_index.join(' ')}</p>
-            <p className='m-0 me-3'>Type: {order.claim_type}</p>
-          </div>
-          <p className='text-secondary m-0'>Order ID: {orderReference.id}</p>
-          <p className='text-secondary m-0'>
-            Date: {order.date.toDate().toDateString()} {order.date.toDate().toLocaleTimeString('en-us', { hour: "2-digit", minute: "2-digit", timeZoneName: 'short' })}
-          </p>
-        </Col>
-      </Row>
-    </Link>
-  )
-}
+const fetchUserList = (url, order, limit, firstDoc, lastDoc) => fetch(url, {
+  method: 'POST',
+  body: JSON.stringify({
+    order: order,
+    limit: limit,
+    firstDoc: firstDoc,
+    lastDoc: lastDoc,
+  })
+}).then(data => data.json())
 
 export default function Page() {
-  const { data: user } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
+  const [limit, setLimit] = useState(20);
+  const [orderBy, setOrderBy] = useState('creation');
+
+  const [firstDoc, setFirstDoc] = useState();
+  const [lastDoc, setLastDoc] = useState();
 
   const [tab, setTab] = useState(0);
-  const [adminTab, setAdminTab] = useState(0);
+
+  const { data: users } = useSWR(
+    ['api/user/list', orderBy, limit, firstDoc, lastDoc],
+    ([url, order, limit, firstDoc, lastDoc]) => fetchUserList(url, order, limit, firstDoc, lastDoc),
+    { suspense: true }
+  )
+
+  function next() {
+    setLastDoc(users.docs[limit - 1])
+    setFirstDoc(undefined)
+  }
+
+  function prev() {
+    setFirstDoc(users.docs[0])
+    setLastDoc(undefined)
+  }
 
   return (
     <main className='bg-light text-dark'>
@@ -85,36 +55,136 @@ export default function Page() {
         <Row>
           <Col xs={12} s={12} md={2} lg={2}>
             <div className='my-3'>
-              <Button active={tab === 0} onClick={() => setTab(0)} className='text-start text-secondary' block color='light'>ACCOUNT</Button>
-              <Button active={tab === 1} onClick={() => setTab(1)} className='text-start mt-2 text-secondary' block color='light'>ORDERS</Button>
+              <Button active={tab === 0} onClick={() => setTab(0)} className='text-start text-secondary' block color='light'>OVERVIEW</Button>
+              <Button active={tab === 1} onClick={() => setTab(1)} className='text-start mt-2 text-secondary' block color='light'>ACCOUNTS</Button>
+              <Button active={tab === 2} onClick={() => setTab(2)} className='text-start mt-2 text-secondary' block color='light'>PRODUCTS</Button>
             </div>
           </Col>
           <Col xs={12} s={12} md={10} lg={10}>
             <div className={tab === 0 ? '' : 'd-none'}>
-              <h4>Account Overview</h4>
-              
-            </div> 
-            <div className={tab === 1 ? '' : 'd-none'}>
-              <h4>Orders ({user.orders.length})</h4>
-              {user.orders.length > 0 ? user.orders.map(order => <Order key={order.id} orderReference={order} />) : <h3 className='text-secondary'>No orders to see here</h3>}
+              <h4>Overview</h4>
+              <h5 className='text-secondary'>Statistics here</h5>
             </div>
-            {
-              tab === 2 && <div>
-                <div className='d-flex align-items-center gap-3'>
-                  <h4 className='m-0'>Admin Panel</h4>
-                  <div className="d-flex gap-2">
-                    <Button color='primary' size={'sm'} onClick={() => setAdminTab(0)}>Tickets</Button>
-                    <Button color='primary' size={'sm'} onClick={() => setAdminTab(1)}>Users</Button>
+            <div className={tab === 1 ? '' : 'd-none'}>
+              <div className="d-flex align-items-center mb-3">
+                <h4 className='m-0'>Manage user accounts</h4>
+                <div className='d-flex flex-grow-1 justify-content-end'>
+                  <div className='d-flex align-items-center gap-2 me-3'>
+                    <p className="m-0">Show</p>
+                    <div>
+                      <Input
+                        type='select'
+                        onChange={(e) => { setLimit(Number(e.target.value)) }}
+                      >
+                        <option value={20}>20</option>
+                        <option value={15}>15</option>
+                        <option value={10}>10</option>
+                        <option value={5}>5</option>
+                      </Input>
+                    </div>
                   </div>
-                </div>
-                <div className={`py-4 ${adminTab === 0 ? '' : 'd-none'}`}>
-                  
-                </div>
-                <div className={`py-4 ${adminTab === 1 ? '' : 'd-none'}`}>
-                  
+                  <div className='d-flex align-items-center gap-2 me-3'>
+                    <p className="m-0">Sort by</p>
+                    <div>
+                      <Input
+                        type='select'
+                        onChange={(e) => { setOrderBy(e.target.value) }}
+                      >
+                        <option value={'creation'}>Creation</option>
+                        <option value={'name'}>Name</option>
+                        <option value={'id'}>ID</option>
+                        <option value={'email'}>Email</option>
+                        <option value={'type'}>Type</option>
+                      </Input>
+                    </div>
+                  </div>
+                  <Button color='secondary' className={'ms-1'} onClick={prev}>prev</Button>
+                  <Button color='secondary' className={'ms-1'} onClick={next}>next</Button>
                 </div>
               </div>
-            }
+              <Table hover responsive className='p-3'>
+                <thead>
+                  <tr>
+                    <th className='col-2'>ID</th>
+                    <th className='col-2'>Email</th>
+                    <th className='col-2'>Display Name</th>
+                    <th className='col-2'>Created on</th>
+                    <th className='col-1'>Type</th>
+                    <th className='col-1'>Orders</th>
+                    <th className='col-2'>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    users.data.map((data, idx) =>
+                      <tr key={`user-table-detail-${idx}`}>
+                        <td className='text-muted'>
+                          <span>{users.docs[idx]}</span>
+                        </td>
+                        <td className='text-muted'>
+                          <span>{data.email}</span>
+                        </td>
+                        <td className='text-muted'>
+                          <span>{data.name.display}</span>
+                        </td>
+                        <td className='text-muted'>
+                          <span>{(new Timestamp(data.creation.seconds, data.creation.nanoseconds)).toDate().toUTCString()}</span>
+                        </td>
+                        <td className='text-muted'>
+                          <span>{data.type}</span>
+                        </td>
+                        <td className='text-muted'>
+                          <span>View Orders</span>
+                        </td>
+                        <td className='text-muted'>
+                          <span>action</span>
+                        </td>
+                      </tr>
+                    )
+                  }
+                </tbody>
+              </Table>
+            </div>
+            <div className={tab === 2 ? '' : 'd-none'}>
+              <div className="d-flex align-items-center mb-3">
+                <h4 className='m-0'>Manage products</h4>
+                <Button className='ms-3'> Add + </Button>
+                <div className='d-flex flex-grow-1 justify-content-end'>
+                  <div className='d-flex align-items-center gap-2 me-5'>
+                    <p className="m-0 w-100">Sort by</p>
+                    <Input
+                      placeholder='Genre'
+                      type='select'
+                      onChange={(e) => { setOrderBy(e.target.value) }}
+                    >
+                      <option value={'creation'}>Creation</option>
+                      <option value={'name'}>Name</option>
+                      <option value={'id'}>ID</option>
+                      <option value={'email'}>Email</option>
+                      <option value={'type'}>Type</option>
+                    </Input>
+                  </div>
+                  <Button color='secondary' className={'ms-1'} onClick={prev}>prev</Button>
+                  <Button color='secondary' className={'ms-1'} onClick={next}>next</Button>
+                </div>
+              </div>
+              <Table hover responsive className='p-3'>
+                <thead>
+                  <tr>
+                    <th className='col-2'>ID</th>
+                    <th className='col-2'>Product Name</th>
+                    <th className='col-2'>Category</th>
+                    <th className='col-2'>Created on</th>
+                    <th className='col-1'>Type</th>
+                    <th className='col-1'>Ratings</th>
+                    <th className='col-2'>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+              </Table>
+            </div>
           </Col>
         </Row>
       </Container>

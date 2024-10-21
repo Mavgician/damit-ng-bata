@@ -77,23 +77,24 @@ export default function Page() {
   const { data: user } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
 
   const [tab, setTab] = useState(0);
-  const [adminTab, setAdminTab] = useState(0);
 
   const timestamp = new Timestamp(user.creation.seconds, user.creation.nanoseconds)
 
   return (
     <main className='bg-light text-dark'>
       <Container className='p-5' fluid>
+        <h1>Account Overview</h1>
         <Row>
           <Col xs={12} s={12} md={2} lg={2}>
             <div className='my-3'>
               <Button active={tab === 0} onClick={() => setTab(0)} className='text-start text-secondary' block color='light'>ACCOUNT</Button>
               <Button active={tab === 1} onClick={() => setTab(1)} className='text-start mt-2 text-secondary' block color='light'>ORDERS</Button>
+              <Button active={tab === 2} onClick={() => setTab(1)} className='text-start mt-2 text-secondary' block color='light'>PRIVACY & SECURITY</Button>
             </div>
           </Col>
           <Col xs={12} s={12} md={10} lg={10}>
             <div className={tab === 0 ? '' : 'd-none'}>
-              <h4>Account Overview</h4>
+              <h4>Basic Information</h4>
               <b>
                 <p className='m-0'>Name: {user.name.first} {user.name.last}</p>
                 <p className='m-0'>Username: {user.name.display}</p>
@@ -104,28 +105,14 @@ export default function Page() {
                 <p className='m-0'>Account type: {user.type}</p>
               </div>
               <p className="m-0">Account created at: {timestamp.toDate().toLocaleString()}</p>
-            </div> 
+            </div>
             <div className={tab === 1 ? '' : 'd-none'}>
               <h4>Orders ({user.orders.length})</h4>
               {user.orders.length > 0 ? user.orders.map(order => <Order key={order.id} orderReference={order} />) : <h3 className='text-secondary'>No orders to see here</h3>}
             </div>
-            {
-              tab === 2 && <div>
-                <div className='d-flex align-items-center gap-3'>
-                  <h4 className='m-0'>Admin Panel</h4>
-                  <div className="d-flex gap-2">
-                    <Button color='primary' size={'sm'} onClick={() => setAdminTab(0)}>Tickets</Button>
-                    <Button color='primary' size={'sm'} onClick={() => setAdminTab(1)}>Users</Button>
-                  </div>
-                </div>
-                <div className={`py-4 ${adminTab === 0 ? '' : 'd-none'}`}>
-                  
-                </div>
-                <div className={`py-4 ${adminTab === 1 ? '' : 'd-none'}`}>
-                  
-                </div>
-              </div>
-            }
+            <div className={tab === 2 ? '' : 'd-none'}>
+              <h4>Privacy</h4>
+            </div>
           </Col>
         </Row>
       </Container>

@@ -28,7 +28,7 @@ export function Footer() {
                 DNB Online
               </h6>
               <p>
-                A childrens clothing company. We prioritize affordability without comprimising quality.
+                A childrens clothing company. Prioritizing affordability without compromising quality.
               </p>
             </Col>
             <Col md="2" lg="2" xl="2" className="mx-auto mb-4">
@@ -37,10 +37,10 @@ export function Footer() {
                 About Us
               </Link>
               <Link href="#!" className="text-decoration-none d-block text-white">
-                Girls
+                Boys
               </Link>
               <Link href="#!" className="text-decoration-none d-block text-white">
-                Boys
+                Girls
               </Link>
             </Col>
             <Col md="3" lg="2" xl="2" className="mx-auto mb-4">
@@ -84,7 +84,7 @@ export function Footer() {
       >
         © 2024 Copyright&nbsp;
         <Link className="text-decoration-none fw-bold text-white" href="#">
-          DNB.Com
+          DNB.com
         </Link>
       </section>
     </footer>
