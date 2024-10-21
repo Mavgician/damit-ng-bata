@@ -9,7 +9,7 @@ import {
   Input
 } from 'reactstrap'
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 import { Timestamp } from 'firebase/firestore';
 
@@ -102,7 +102,7 @@ export default function Page() {
                 <tbody>
                   {
                     users.data.map((data, idx) =>
-                      <tr>
+                      <tr key={`user-table-detail-${idx}`}>
                         <td className='text-muted'>
                           <span>{users.docs[idx]}</span>
                         </td>
