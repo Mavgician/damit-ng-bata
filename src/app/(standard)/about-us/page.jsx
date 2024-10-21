@@ -18,13 +18,13 @@ function Page() {
             Our team of knowledgeable and experienced professionals upholds the highest standards of service at DNB. We take immense pride in our meticulous processes, fostering trust and satisfaction in a secure and efficient environment.
           </p>
           <p>
-            In addition to our commitment to excellence in clothe selling, we value community engagement and regularly participate in events aimed at promoting affordability for parents. We believe in contributing to the cultural vibrancy of our community and supporting initiatives that enhance the overall experience of parents. DNB is not just a children'  s apparel selling platform; it&apos;s a part of the rich history of parenting.
+            In addition to our commitment to excellence in clothe selling, we value community engagement and regularly participate in events aimed at promoting affordability for parents. We believe in contributing to the cultural vibrancy of our community and supporting initiatives that enhance the overall experience of parents. DNB is not just a children&apos;  s apparel selling platform; it&apos;s a part of the rich history of parenting.
           </p>
           <h3>OUR MISSION</h3>
           <p>
             &quot;<i>At <b>DNB</b>,</i> our mission is to <b>enhance the life and overall enjoyment</b>
             of parents by providing <i>exceptional apparel services</i> in a customer-focused
-            environment. We are dedicated to offering a wide range of children's apparel for various uses and
+            environment. We are dedicated to offering a wide range of children&apos;s apparel for various uses and
             situations, ensuring that everyone can find the perfect experience.
           </p>
           <p>
