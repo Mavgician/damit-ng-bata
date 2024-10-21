@@ -9,7 +9,8 @@ import {
   Container,
   Row,
   Col,
-  FormFeedback
+  FormFeedback,
+  Spinner
 } from 'reactstrap'
 
 import { useState, useEffect } from 'react';
@@ -25,10 +26,14 @@ export default function Page() {
 
   const [invalid, setInvalid] = useState(false);
 
+  const [isCreated, setIsCreated] = useState(false);
+
   const router = useRouter()
 
   async function submitHandler() {
     if (username.length <= 0 || firstName.length <= 0 || lastName.length <= 0) return setInvalid(true)
+
+    setIsCreated(true)
 
     router.replace('/')
 
@@ -37,7 +42,7 @@ export default function Page() {
       {
         method: 'POST',
         body: JSON.stringify({
-          display_name: firstName,
+          display_name: username,
           last_name: lastName,
           first_name: firstName
         })
@@ -109,9 +114,19 @@ export default function Page() {
               </FormGroup>
             </Col>
           </Row>
-          <Button className='my-3' block onClick={submitHandler}>
-            Complete Account
-          </Button>
+          {
+            isCreated ?
+              <div className="d-flex justify-content-center align-items-center my-3">
+                <h3 style={{ margin: 0 }}>
+                  Completing your account
+                </h3>
+                <Spinner className="ms-3"></Spinner>
+              </div>
+              :
+              <Button className='my-3' block onClick={submitHandler}>
+                Complete Account
+              </Button>
+          }
         </Form>
       </Container>
     </main>
