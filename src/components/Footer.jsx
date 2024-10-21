@@ -25,10 +25,10 @@ export function Footer() {
             <Col md="3" lg="4" xl="3" className="mx-auto mb-4">
               <h6 className="text-uppercase fw-bold mb-4">
                 {/* <MDBIcon icon="gem" className="me-3" /> */}
-                ConFlix Online
+                DNB Online
               </h6>
               <p>
-                A ticket reseller established during the pandemic. We strive to deliver a service that brings tickets to everyone.
+                A childrens clothing company. Prioritizing affordability without compromising quality.
               </p>
             </Col>
             <Col md="2" lg="2" xl="2" className="mx-auto mb-4">
@@ -37,10 +37,10 @@ export function Footer() {
                 About Us
               </Link>
               <Link href="#!" className="text-decoration-none d-block text-white">
-                Events
+                Boys
               </Link>
               <Link href="#!" className="text-decoration-none d-block text-white">
-                Tickets
+                Girls
               </Link>
             </Col>
             <Col md="3" lg="2" xl="2" className="mx-auto mb-4">
@@ -84,7 +84,7 @@ export function Footer() {
       >
         © 2024 Copyright&nbsp;
         <Link className="text-decoration-none fw-bold text-white" href="#">
-          ConFlix.com
+          DNB.com
         </Link>
       </section>
     </footer>

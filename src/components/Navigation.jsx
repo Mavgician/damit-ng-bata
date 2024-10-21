@@ -142,7 +142,7 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
         <Collapse isOpen={isOpen} navbar>
           <Nav className='ms-auto fw-bold d-flex align-items-center' navbar>
             <NavItem>
-              <NavLink href='/products/boys'>Boys</NavLink>
+              <NavLink href='/boys'>Boys</NavLink>
             </NavItem>
             <NavItem>
               <NavLink href='/products/girls'>Girls</NavLink>
