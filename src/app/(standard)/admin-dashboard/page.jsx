@@ -24,7 +24,7 @@ const fetchUserList = (url, order, limit, firstDoc, lastDoc) => fetch(url, {
 }).then(data => data.json())
 
 export default function Page() {
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(20);
   const [orderBy, setOrderBy] = useState('creation');
 
   const [firstDoc, setFirstDoc] = useState();
@@ -69,19 +69,34 @@ export default function Page() {
               <div className="d-flex align-items-center mb-3">
                 <h4 className='m-0'>Manage user accounts</h4>
                 <div className='d-flex flex-grow-1 justify-content-end'>
-                  <div className='d-flex align-items-center gap-2 me-5'>
-                    <p className="m-0 w-100">Sort by</p>
-                    <Input
-                      placeholder='Genre'
-                      type='select'
-                      onChange={(e) => { setOrderBy(e.target.value) }}
-                    >
-                      <option value={'creation'}>Creation</option>
-                      <option value={'name'}>Name</option>
-                      <option value={'id'}>ID</option>
-                      <option value={'email'}>Email</option>
-                      <option value={'type'}>Type</option>
-                    </Input>
+                  <div className='d-flex align-items-center gap-2 me-3'>
+                    <p className="m-0">Show</p>
+                    <div>
+                      <Input
+                        type='select'
+                        onChange={(e) => { setLimit(Number(e.target.value)) }}
+                      >
+                        <option value={20}>20</option>
+                        <option value={15}>15</option>
+                        <option value={10}>10</option>
+                        <option value={5}>5</option>
+                      </Input>
+                    </div>
+                  </div>
+                  <div className='d-flex align-items-center gap-2 me-3'>
+                    <p className="m-0">Sort by</p>
+                    <div>
+                      <Input
+                        type='select'
+                        onChange={(e) => { setOrderBy(e.target.value) }}
+                      >
+                        <option value={'creation'}>Creation</option>
+                        <option value={'name'}>Name</option>
+                        <option value={'id'}>ID</option>
+                        <option value={'email'}>Email</option>
+                        <option value={'type'}>Type</option>
+                      </Input>
+                    </div>
                   </div>
                   <Button color='secondary' className={'ms-1'} onClick={prev}>prev</Button>
                   <Button color='secondary' className={'ms-1'} onClick={next}>next</Button>
@@ -166,7 +181,7 @@ export default function Page() {
                   </tr>
                 </thead>
                 <tbody>
-                  
+
                 </tbody>
               </Table>
             </div>
