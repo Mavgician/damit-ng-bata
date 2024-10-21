@@ -64,7 +64,7 @@ function ProfilePopup({ user, firestoreUser }) {
           marginLeft: 8,
           marginRight: 13,
           marginBottom: 0,
-        }}>{user?.displayName}</div>}
+        }}>{firestoreUser.name.display}</div>}
         <div style={{ fontSize: 14, color: "#00000088", marginLeft: 8, marginRight: 13 }}>{user?.email}</div>
       </div>
     </div>
@@ -142,7 +142,7 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
         <Collapse isOpen={isOpen} navbar>
           <Nav className='ms-auto fw-bold d-flex align-items-center' navbar>
             <NavItem>
-              <NavLink href='/products/boys'>Boys</NavLink>
+              <NavLink href='/boys'>Boys</NavLink>
             </NavItem>
             <NavItem>
               <NavLink href='/products/girls'>Girls</NavLink>
