@@ -23,9 +23,8 @@ import { fetchUserPost } from '@/lib/DataServer';
 
 import useSWR from 'swr';
 
-function ProfilePopup({ user }) {
-  const { data: firestoreUser } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
-
+function ProfilePopup({ user, firestoreUser }) {
+  
   const imageUrl = user?.photoURL ?? "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=" + (user?.displayName ?? user?.email);
 
   const popupStyle = {
@@ -119,6 +118,7 @@ function ProfileButtonTrigger({ user, size }) {
 };
 
 export function Navigationbar({ transparent = false, isFixed = true }) {
+  const { data: firestoreUser } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
   const user = getUserCS()
 
   const [isOpen, setIsOpen] = useState(false);
@@ -164,7 +164,7 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
                   >
                     <div>
                       <Button onClick={() => setIsPopoverOpen(!isPopoverOpen)} color='transparent'>
-                        <ProfileButtonTrigger user={user.currentUser} size={40} />
+                        <ProfileButtonTrigger user={user.currentUser} firestoreUser={firestoreUser} size={40} />
                       </Button>
                     </div>
                   </Popover>
