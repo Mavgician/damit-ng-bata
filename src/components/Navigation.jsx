@@ -26,9 +26,6 @@ import useSWR from 'swr';
 function ProfilePopup({ user, firestoreUser }) {
   const imageUrl = user?.photoURL ?? "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=" + (user?.displayName ?? user?.email);
 
-  console.log(firestoreUser);
-  
-
   const popupStyle = {
     width: "calc(-40px + min(100vw, 370px))",
     backgroundColor: '#fff',
@@ -120,13 +117,13 @@ function ProfileButtonTrigger({ user, size }) {
 };
 
 export function Navigationbar({ transparent = false, isFixed = true }) {
-  const { data: firestoreUser } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
-  const user = getUserCS()
-
   const [isOpen, setIsOpen] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
+
+  const { data: firestoreUser } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
+  const user = getUserCS()
 
   return (
     <>
