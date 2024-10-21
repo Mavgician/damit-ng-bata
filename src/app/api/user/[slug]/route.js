@@ -1,5 +1,5 @@
 import { db } from '@/firebase-app-config.js'
-import { collection, doc, endBefore, getDoc, getDocs, limit, orderBy, query, setDoc, startAfter, Timestamp } from 'firebase/firestore';
+import { collection, doc, endBefore, getCountFromServer, getDoc, getDocs, limit, orderBy, query, setDoc, startAfter, Timestamp } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 
 import { getAppSS, getUserSS } from "firebase-nextjs/server/auth";
@@ -66,26 +66,32 @@ export async function POST(req, { params }) {
 
             case 'list':
                 if (userDoc.type === 'admin') {
-                    let data = []
+                    let data = [], ids = []
                     let queryRef
 
                     const collectionRef = collection(db, 'users')
+                    const initQuery = query(collectionRef, orderBy(body.order), limit(body.limit))
+
+                    const totalCount = await getCountFromServer(collectionRef)
 
                     if (body.firstDoc) {
-                        queryRef = query(collectionRef, orderBy(body.order), limit(body.limit), endBefore(body.firstDoc))
+                        const cursor = await getDoc(doc(db, 'users', body.firstDoc))
+                        queryRef = query(initQuery, endBefore(cursor))
                     } else if (body.lastDoc) {
-                        queryRef = query(collectionRef, orderBy(body.order), limit(body.limit), startAfter(body.lastDoc))
+                        const cursor = await getDoc(doc(db, 'users', body.lastDoc))
+                        queryRef = query(initQuery, startAfter(cursor))
                     } else {
-                        queryRef = query(collectionRef, orderBy(body.order), limit(body.limit))
+                        queryRef = initQuery
                     }
 
                     const snapshot = await getDocs(queryRef)
 
                     for (let i = 0; i < snapshot.docs.length; i++) {
                         data.push(snapshot.docs[i].data())
+                        ids.push(snapshot.docs[i].id)
                     }
 
-                    return NextResponse.json({ ...data }, { status: 200 })
+                    return NextResponse.json({ data, docs: ids, count: totalCount.data().count }, { status: 200 })
                 } else if (userDoc.type !== 'admin') {
                     return NextResponse.json({ error: 'Cannot fetch user list. User lacks authorization.' }, { status: 401 })
                 }
@@ -95,7 +101,9 @@ export async function POST(req, { params }) {
             default:
                 return NextResponse.json({ error: 'Unknown fetch type' }, { status: 501 })
         }
-    } catch {
+    } catch (error) {
+        console.log(error);
+
         return NextResponse.json({ error: 'Wrong request body' }, { status: 500 })
     }
 
