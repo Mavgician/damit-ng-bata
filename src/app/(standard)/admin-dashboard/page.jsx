@@ -16,7 +16,6 @@ import { fetchUserPost } from '@/src/lib/DataServer';
 
 import useSWR from 'swr';
 import Image from 'next/image';
-import { Timestamp } from 'firebase/firestore';
 
 function Order({ orderReference }) {
   const [order, setOrder] = useState({
@@ -78,8 +77,6 @@ export default function Page() {
 
   const [tab, setTab] = useState(0);
   const [adminTab, setAdminTab] = useState(0);
-
-  const timestamp = new Timestamp(user.creation.seconds, user.creation.nanoseconds)
 
   return (
     <main className='bg-light text-dark'>
