@@ -64,7 +64,7 @@ function ProfilePopup({ user, firestoreUser }) {
           marginLeft: 8,
           marginRight: 13,
           marginBottom: 0,
-        }}>{user?.displayName}</div>}
+        }}>{firestoreUser.name.display}</div>}
         <div style={{ fontSize: 14, color: "#00000088", marginLeft: 8, marginRight: 13 }}>{user?.email}</div>
       </div>
     </div>

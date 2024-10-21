@@ -1,5 +1,5 @@
 import { db } from '@/firebase-app-config.js'
-import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
+import { collection, doc, endBefore, getDoc, getDocs, limit, orderBy, query, setDoc, startAfter, Timestamp } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 
 import { getAppSS, getUserSS } from "firebase-nextjs/server/auth";
@@ -40,31 +40,63 @@ export async function POST(req, { params }) {
         type: 'user'
     }
 
-    switch (params.slug) {
-        case 'new':
-            await setDoc(document, payload)
-            break;
+    try {
+        switch (params.slug) {
+            case 'new':
+                await setDoc(document, payload)
+                break;
 
-        case 'update':
-            const updated = {
-                ...userDoc,
-                name: {
-                    ...payload.name
+            case 'update':
+                const updated = {
+                    ...userDoc,
+                    name: {
+                        ...payload.name
+                    }
                 }
-            }
 
-            await setDoc(document, updated)
-            break;
+                await setDoc(document, updated)
+                break;
 
-        case 'verify':
-            if (userDocRaw.exists()) {
-                return NextResponse.json({ ...userDoc }, { status: 200 })
-            } else {
-                return NextResponse.json({ message: 'User does not exist' }, { status: 404 })
-            }
+            case 'verify':
+                if (userDocRaw.exists()) {
+                    return NextResponse.json({ ...userDoc }, { status: 200 })
+                } else {
+                    return NextResponse.json({ message: 'User does not exist' }, { status: 404 })
+                }
 
-        default:
-            return NextResponse.json({ error: 'Unknown fetch type' }, { status: 501 })
+            case 'list':
+                if (userDoc.type === 'admin') {
+                    let data = []
+                    let queryRef
+
+                    const collectionRef = collection(db, 'users')
+
+                    if (body.firstDoc) {
+                        queryRef = query(collectionRef, orderBy(body.order), limit(body.limit), endBefore(body.firstDoc))
+                    } else if (body.lastDoc) {
+                        queryRef = query(collectionRef, orderBy(body.order), limit(body.limit), startAfter(body.lastDoc))
+                    } else {
+                        queryRef = query(collectionRef, orderBy(body.order), limit(body.limit))
+                    }
+
+                    const snapshot = await getDocs(queryRef)
+
+                    for (let i = 0; i < snapshot.docs.length; i++) {
+                        data.push(snapshot.docs[i].data())
+                    }
+
+                    return NextResponse.json({ ...data }, { status: 200 })
+                } else if (userDoc.type !== 'admin') {
+                    return NextResponse.json({ error: 'Cannot fetch user list. User lacks authorization.' }, { status: 401 })
+                }
+
+                break;
+
+            default:
+                return NextResponse.json({ error: 'Unknown fetch type' }, { status: 501 })
+        }
+    } catch {
+        return NextResponse.json({ error: 'Wrong request body' }, { status: 500 })
     }
 
     return NextResponse.json({ message: 'success' }, { status: 200 })
