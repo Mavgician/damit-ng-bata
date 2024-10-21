@@ -11,6 +11,9 @@ const AUTH_PATHS = [
     "/login",
     "/register",
     "/forgot-password",
+]
+
+const ADMIN_PATHS = [
     "/admin-dashboard"
 ]
 
@@ -20,13 +23,12 @@ export default async function middleware(req) {
 
     const rule = new RegExp(options.allowRule)
 
-    // If user is already logged in, and tries an auth page
-    // Redirect to the target page
-    if (loggedIn && AUTH_PATHS.includes(path)) {
+    // Check if authenticated user has the correct roles.
+    if (loggedIn) {
+        const target = req.nextUrl.searchParams.get('target') ?? "/"
+    
         const cookieStore = cookies()
         const token = cookieStore.get('firebase_nextjs_token')
-
-        const target = req.nextUrl.searchParams.get('target') ?? "/";
         const verifyUser = await fetch(
             new URL('/api/user/verify', req.nextUrl),
             {
@@ -38,15 +40,23 @@ export default async function middleware(req) {
             }
         )
 
-        if (verifyUser.status === 404) {
+        const isAdmin = ADMIN_PATHS.includes(path) && (await verifyUser.json()).type === 'admin'
+
+        if (AUTH_PATHS.includes(path) && verifyUser.status == 404) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
         }
 
-        if (path.split('/').includes('admin-dashboard') && await verifyUser.json().type !== 'admin') {
-            return NextResponse.redirect(new URL('/not-allowed', req.nextUrl));
+        if (AUTH_PATHS.includes(path)) {
+            return NextResponse.redirect(new URL(target, req.nextUrl));
         }
 
-        return NextResponse.redirect(new URL(target, req.nextUrl));
+        if (ADMIN_PATHS.includes(path) && isAdmin) {
+            return NextResponse.next()
+        } else if (ADMIN_PATHS.includes(path) && !isAdmin) {
+            return NextResponse.redirect(new URL('/not-allowed', req.nextUrl))
+        }
+
+        return NextResponse.next()
     }
 
     if (path.split('/').includes('api')) {
@@ -62,10 +72,6 @@ export default async function middleware(req) {
     // If a regex rule is defined in allowRule, allow the path if it matches
     // Every other form of rule specification is ignored.
     if (rule.test(path)) {
-        return NextResponse.next()
-    }
-
-    if (loggedIn) {
         return NextResponse.next()
     }
 
