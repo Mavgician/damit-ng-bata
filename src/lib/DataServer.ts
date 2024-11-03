@@ -1,3 +1,1 @@
-export const getAllProducts = (e: string) => fetch(e).then((data) => data.json())
-
-export const fetchUserPost = (e: string) => fetch(e, {method: "POST"}).then(data => data.json())
+export const fetchParsed = (e: string, method: string = 'POST') => fetch(e, {method: method}).then((data) => data.json())
