@@ -1,6 +1,8 @@
 import { db } from '@/firebase-app-config.js'
-import { collection, doc, endBefore, getCountFromServer, getDoc, getDocs, limit, orderBy, query, setDoc, startAfter, Timestamp } from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
+
+import { fetchCollectionItems } from '@/api/fetch_functions'
 
 import { getAppSS, getUserSS } from "firebase-nextjs/server/auth";
 import { getAuth } from 'firebase-admin/auth';
@@ -13,7 +15,7 @@ export async function POST(req, { params }) {
 
     try {
         body = await req.json()
-        currentUser = await getAuth(app).verifySessionCookie(body?.token)
+        currentUser = currentUser ?? await getAuth(app).verifySessionCookie(body?.token)
     } catch {
         console.warn('Request body is not set.')
     }
@@ -26,7 +28,7 @@ export async function POST(req, { params }) {
     const userDocRaw = await getDoc(document)
     const userDoc = userDocRaw.data()
 
-    const payload = {
+    const newUserdata = {
         creation: Timestamp.now(),
         email: currentUser.email,
         locations: [],
@@ -37,20 +39,21 @@ export async function POST(req, { params }) {
         },
         orders: [],
         ratings: [],
+        cart: [],
         type: 'user'
     }
 
     try {
         switch (params.slug) {
             case 'new':
-                await setDoc(document, payload)
+                await setDoc(document, newUserdata)
                 break;
 
             case 'update':
                 const updated = {
                     ...userDoc,
                     name: {
-                        ...payload.name
+                        ...newUserdata.name
                     }
                 }
 
@@ -66,44 +69,33 @@ export async function POST(req, { params }) {
 
             case 'list':
                 if (userDoc.type === 'admin') {
-                    let data = [], ids = []
-                    let queryRef
-
                     const collectionRef = collection(db, 'users')
-                    const initQuery = query(collectionRef, orderBy(body.order), limit(body.limit))
+                    const items = await fetchCollectionItems(collectionRef, body.order, body.limit, body.firstDoc, body.lastDoc)
 
-                    const totalCount = await getCountFromServer(collectionRef)
-
-                    if (body.firstDoc) {
-                        const cursor = await getDoc(doc(db, 'users', body.firstDoc))
-                        queryRef = query(initQuery, endBefore(cursor))
-                    } else if (body.lastDoc) {
-                        const cursor = await getDoc(doc(db, 'users', body.lastDoc))
-                        queryRef = query(initQuery, startAfter(cursor))
-                    } else {
-                        queryRef = initQuery
-                    }
-
-                    const snapshot = await getDocs(queryRef)
-
-                    for (let i = 0; i < snapshot.docs.length; i++) {
-                        data.push(snapshot.docs[i].data())
-                        ids.push(snapshot.docs[i].id)
-                    }
-
-                    return NextResponse.json({ data, docs: ids, count: totalCount.data().count }, { status: 200 })
+                    return NextResponse.json(items, { status: 200 })
                 } else if (userDoc.type !== 'admin') {
-                    return NextResponse.json({ error: 'Cannot fetch user list. User lacks authorization.' }, { status: 401 })
+                    return NextResponse.json({ error: 'Cannot fetch user list. User lacks permission.' }, { status: 401 })
+                } else {
+                    return NextResponse.json({ error: 'User not logged in.' }, { status: 401 })
                 }
 
-                break;
+            case 'cart':
+                const collectionRef = collection(db, 'products')
+                const items = userDoc.cart
+                let itemsParsed = []
+
+                for (let i = 0; i < items.length; i++) {
+                    const document = (await getDoc(doc(collectionRef, items[i].item.id))).data()
+                    itemsParsed.push({ item: document, quantity: items[i].quantity })
+                }
+
+                return NextResponse.json(itemsParsed, { status: 200 })
 
             default:
                 return NextResponse.json({ error: 'Unknown fetch type' }, { status: 501 })
         }
     } catch (error) {
         console.log(error);
-
         return NextResponse.json({ error: 'Wrong request body' }, { status: 500 })
     }
 
