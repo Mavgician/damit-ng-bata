@@ -12,7 +12,7 @@ import {
 import { useState, useEffect } from 'react';
 
 /* import { getUserCS } from 'firebase-nextjs/client/auth'; */
-import { fetchUserPost } from '@/src/lib/DataServer';
+import { fetchParsed } from '@/src/lib/DataServer';
 
 import useSWR from 'swr';
 import Image from 'next/image';
@@ -74,7 +74,7 @@ function Order({ orderReference }) {
 }
 
 export default function Page() {
-  const { data: user } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
+  const { data: user } = useSWR('api/user/verify', fetchParsed, { suspense: true })
 
   const [tab, setTab] = useState(0);
 

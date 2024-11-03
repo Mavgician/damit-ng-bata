@@ -19,7 +19,7 @@ import { Popover } from 'react-tiny-popover';
 
 import { getUserCS } from 'firebase-nextjs/client/auth';
 import { LogoutButton } from 'firebase-nextjs/client/components';
-import { fetchUserPost } from '@/lib/DataServer';
+import { fetchParsed } from '@/lib/DataServer';
 
 import useSWR from 'swr';
 
@@ -77,7 +77,7 @@ function ProfilePopup({ user, firestoreUser }) {
               <FontAwesomeIcon style={icon} icon={faShield} />
             </div>
             Admin
-          </NavLink> : 
+          </NavLink> :
           null
       }
       <NavLink href='/profile' className='px-3 py-2 profilePopoverLink'>
@@ -122,7 +122,7 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
 
   const toggle = () => setIsOpen(!isOpen);
 
-  const { data: firestoreUser } = useSWR('api/user/verify', fetchUserPost, { suspense: true })
+  const { data: firestoreUser } = useSWR('api/user/verify', fetchParsed, { suspense: true })
   const user = getUserCS()
 
   return (
@@ -170,7 +170,7 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
                   :
                   <NavLink href={'/login'}>
                     <Button color='dark'>
-                      Sign Up
+                      Login
                     </Button>
                   </NavLink>
               }
