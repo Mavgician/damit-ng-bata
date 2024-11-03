@@ -9,9 +9,10 @@ import {
   Input
 } from 'reactstrap'
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import useSWR from 'swr';
 import { Timestamp } from 'firebase/firestore';
+import { createContext } from 'react';
 
 const fetchUserList = (url, order, limit, firstDoc, lastDoc) => fetch(url, {
   method: 'POST',
@@ -23,30 +24,10 @@ const fetchUserList = (url, order, limit, firstDoc, lastDoc) => fetch(url, {
   })
 }).then(data => data.json())
 
+const AdminTableData = createContext(null)
+
 export default function Page() {
-  const [limit, setLimit] = useState(20);
-  const [orderBy, setOrderBy] = useState('creation');
-
-  const [firstDoc, setFirstDoc] = useState();
-  const [lastDoc, setLastDoc] = useState();
-
   const [tab, setTab] = useState(0);
-
-  const { data: users } = useSWR(
-    ['api/user/list', orderBy, limit, firstDoc, lastDoc],
-    ([url, order, limit, firstDoc, lastDoc]) => fetchUserList(url, order, limit, firstDoc, lastDoc),
-    { suspense: true }
-  )
-
-  function next() {
-    setLastDoc(users.docs[limit - 1])
-    setFirstDoc(undefined)
-  }
-
-  function prev() {
-    setFirstDoc(users.docs[0])
-    setLastDoc(undefined)
-  }
 
   return (
     <main className='bg-light text-dark'>
@@ -62,132 +43,169 @@ export default function Page() {
           </Col>
           <Col xs={12} s={12} md={10} lg={10}>
             <div className={tab === 0 ? '' : 'd-none'}>
-              <h4>Overview</h4>
+              <h4 className='m-0'>Overview</h4>
               <h5 className='text-secondary'>Statistics here</h5>
             </div>
             <div className={tab === 1 ? '' : 'd-none'}>
-              <div className="d-flex align-items-center mb-3">
-                <h4 className='m-0'>Manage user accounts</h4>
-                <div className='d-flex flex-grow-1 justify-content-end'>
-                  <div className='d-flex align-items-center gap-2 me-3'>
-                    <p className="m-0">Show</p>
-                    <div>
-                      <Input
-                        type='select'
-                        onChange={(e) => { setLimit(Number(e.target.value)) }}
-                      >
-                        <option value={20}>20</option>
-                        <option value={15}>15</option>
-                        <option value={10}>10</option>
-                        <option value={5}>5</option>
-                      </Input>
-                    </div>
-                  </div>
-                  <div className='d-flex align-items-center gap-2 me-3'>
-                    <p className="m-0">Sort by</p>
-                    <div>
-                      <Input
-                        type='select'
-                        onChange={(e) => { setOrderBy(e.target.value) }}
-                      >
-                        <option value={'creation'}>Creation</option>
-                        <option value={'name'}>Name</option>
-                        <option value={'id'}>ID</option>
-                        <option value={'email'}>Email</option>
-                        <option value={'type'}>Type</option>
-                      </Input>
-                    </div>
-                  </div>
-                  <Button color='secondary' className={'ms-1'} onClick={prev}>prev</Button>
-                  <Button color='secondary' className={'ms-1'} onClick={next}>next</Button>
-                </div>
-              </div>
-              <Table hover responsive className='p-3'>
-                <thead>
-                  <tr>
-                    <th className='col-2'>ID</th>
-                    <th className='col-2'>Email</th>
-                    <th className='col-2'>Display Name</th>
-                    <th className='col-2'>Created on</th>
-                    <th className='col-1'>Type</th>
-                    <th className='col-1'>Orders</th>
-                    <th className='col-2'>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    users.data.map((data, idx) =>
-                      <tr key={`user-table-detail-${idx}`}>
-                        <td className='text-muted'>
-                          <span>{users.docs[idx]}</span>
-                        </td>
-                        <td className='text-muted'>
-                          <span>{data.email}</span>
-                        </td>
-                        <td className='text-muted'>
-                          <span>{data.name.display}</span>
-                        </td>
-                        <td className='text-muted'>
-                          <span>{(new Timestamp(data.creation.seconds, data.creation.nanoseconds)).toDate().toUTCString()}</span>
-                        </td>
-                        <td className='text-muted'>
-                          <span>{data.type}</span>
-                        </td>
-                        <td className='text-muted'>
-                          <span>View Orders</span>
-                        </td>
-                        <td className='text-muted'>
-                          <span>action</span>
-                        </td>
-                      </tr>
-                    )
-                  }
-                </tbody>
-              </Table>
+              <AdminModule><Accounts/></AdminModule>
             </div>
             <div className={tab === 2 ? '' : 'd-none'}>
-              <div className="d-flex align-items-center mb-3">
-                <h4 className='m-0'>Manage products</h4>
-                <Button className='ms-3'> Add + </Button>
-                <div className='d-flex flex-grow-1 justify-content-end'>
-                  <div className='d-flex align-items-center gap-2 me-5'>
-                    <p className="m-0 w-100">Sort by</p>
-                    <Input
-                      placeholder='Genre'
-                      type='select'
-                      onChange={(e) => { setOrderBy(e.target.value) }}
-                    >
-                      <option value={'creation'}>Creation</option>
-                      <option value={'name'}>Name</option>
-                      <option value={'id'}>ID</option>
-                      <option value={'email'}>Email</option>
-                      <option value={'type'}>Type</option>
-                    </Input>
-                  </div>
-                  <Button color='secondary' className={'ms-1'} onClick={prev}>prev</Button>
-                  <Button color='secondary' className={'ms-1'} onClick={next}>next</Button>
-                </div>
-              </div>
-              <Table hover responsive className='p-3'>
-                <thead>
-                  <tr>
-                    <th className='col-2'>ID</th>
-                    <th className='col-2'>Product Name</th>
-                    <th className='col-2'>Category</th>
-                    <th className='col-2'>Created on</th>
-                    <th className='col-1'>Type</th>
-                    <th className='col-1'>Ratings</th>
-                    <th className='col-2'>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-              </Table>
+              <AdminModule url='api/product/list'><Products/></AdminModule>
             </div>
           </Col>
         </Row>
       </Container>
     </main>
+  )
+}
+
+function TableControls({ setLimit, setOrderBy, next, prev }) {
+  return (
+    <div className='d-flex flex-grow-1 justify-content-end'>
+      <div className='d-flex align-items-center gap-2 me-3'>
+        <p className="m-0">Show</p>
+        <div>
+          <Input
+            type='select'
+            onChange={(e) => { setLimit(Number(e.target.value)) }}
+          >
+            <option value={20}>20</option>
+            <option value={15}>15</option>
+            <option value={10}>10</option>
+            <option value={5}>5</option>
+          </Input>
+        </div>
+      </div>
+      <div className='d-flex align-items-center gap-2 me-3'>
+        <p className="m-0">Sort by</p>
+        <div>
+          <Input
+            type='select'
+            onChange={(e) => { setOrderBy(e.target.value) }}
+          >
+            <option value={'creation'}>Creation</option>
+            <option value={'name'}>Name</option>
+            <option value={'id'}>ID</option>
+            <option value={'email'}>Email</option>
+            <option value={'type'}>Type</option>
+          </Input>
+        </div>
+      </div>
+      <Button color='secondary' className={'ms-1'} onClick={prev}>prev</Button>
+      <Button color='secondary' className={'ms-1'} onClick={next}>next</Button>
+    </div>
+  )
+}
+
+function AdminModule({children, url = 'api/user/list'}) {
+  const [limit, setLimit] = useState(20);
+  const [orderBy, setOrderBy] = useState('creation');
+
+  const [firstDoc, setFirstDoc] = useState();
+  const [lastDoc, setLastDoc] = useState();
+  
+  const { data } = useSWR(
+    [url, orderBy, limit, firstDoc, lastDoc],
+    ([url, order, limit, firstDoc, lastDoc]) => fetchUserList(url, order, limit, firstDoc, lastDoc),
+    { suspense: true }
+  )
+
+  function next() {
+    setLastDoc(data.docs[limit - 1])
+    setFirstDoc(undefined)
+  }
+
+  function prev() {
+    setFirstDoc(data.docs[0])
+    setLastDoc(undefined)
+  }
+
+  console.log(data);
+  
+  return <AdminTableData.Provider value={{setLimit, setOrderBy, next, prev, data}}>{children}</AdminTableData.Provider>
+}
+
+function Accounts() {
+  const {setLimit, setOrderBy, next, prev, data: users} = useContext(AdminTableData)
+
+  return (
+    <>
+      <div className="d-flex align-items-center mb-3">
+        <h4 className='m-0'>Manage User Accounts</h4>
+        <Button className='ms-3'> Add + </Button>
+        <TableControls setLimit={setLimit} setOrderBy={setOrderBy} next={next} prev={prev} />
+      </div>
+      <Table hover responsive className='p-3'>
+        <thead>
+          <tr>
+            <th className='col-2'>ID</th>
+            <th className='col-2'>Email</th>
+            <th className='col-2'>Display Name</th>
+            <th className='col-2'>Created on</th>
+            <th className='col-1'>Type</th>
+            <th className='col-1'>Orders</th>
+            <th className='col-2'>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            users.data.map((data, idx) =>
+              <tr key={`user-table-detail-${idx}`}>
+                <td className='text-muted'>
+                  <span>{data.id}</span>
+                </td>
+                <td className='text-muted'>
+                  <span>{data.email}</span>
+                </td>
+                <td className='text-muted'>
+                  <span>{data.name.display}</span>
+                </td>
+                <td className='text-muted'>
+                  <span>{(new Timestamp(data.creation.seconds, data.creation.nanoseconds)).toDate().toUTCString()}</span>
+                </td>
+                <td className='text-muted'>
+                  <span>{data.type}</span>
+                </td>
+                <td className='text-muted'>
+                  <span>View Orders</span>
+                </td>
+                <td className='text-muted'>
+                  <span>action</span>
+                </td>
+              </tr>
+            )
+          }
+        </tbody>
+      </Table>
+    </>
+  )
+}
+
+function Products() {
+  const {setLimit, setOrderBy, next, prev, data: products} = useContext(AdminTableData)
+
+  return (
+    <>
+      <div className="d-flex align-items-center mb-3">
+        <h4 className='m-0'>Manage Products</h4>
+        <Button className='ms-3'> Add + </Button>
+        <TableControls setLimit={setLimit} setOrderBy={setOrderBy} next={next} prev={prev} />
+      </div>
+      <Table hover responsive className='p-3'>
+        <thead>
+          <tr>
+            <th className='col-2'>ID</th>
+            <th className='col-2'>Product Name</th>
+            <th className='col-2'>Category</th>
+            <th className='col-2'>Created on</th>
+            <th className='col-1'>Type</th>
+            <th className='col-1'>Ratings</th>
+            <th className='col-2'>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </Table>
+    </>
   )
 }
