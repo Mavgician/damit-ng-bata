@@ -17,11 +17,15 @@ const ADMIN_PATHS = [
     "/admin-dashboard"
 ]
 
+const rule = new RegExp(options.allowRule)
+
 export default async function middleware(req) {
     const path = req.nextUrl.pathname;
     const loggedIn = await checkUser();
 
-    const rule = new RegExp(options.allowRule)
+    if (path.split('/').includes('api')) {
+        return NextResponse.next()
+    }
 
     // Check if authenticated user has the correct roles.
     if (loggedIn) {
@@ -59,18 +63,10 @@ export default async function middleware(req) {
         return NextResponse.next()
     }
 
-    if (path.split('/').includes('api')) {
-        return NextResponse.next()
-    }
-
-    // Requesting an auth page.
-    // These are special routes handled by FirebaseNextJS au1th.
     if (AUTH_PATHS.includes(path)) {
         return NextResponse.next()
     }
 
-    // If a regex rule is defined in allowRule, allow the path if it matches
-    // Every other form of rule specification is ignored.
     if (rule.test(path)) {
         return NextResponse.next()
     }
