@@ -50,7 +50,7 @@ export default function Page() {
   }
 
   useEffect(() => {
-    fetch('api/user/new', { method: 'POST' })
+    fetch('api/user/add', { method: 'POST' })
   }, []);
 
   return (

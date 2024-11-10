@@ -74,7 +74,7 @@ function Order({ orderReference }) {
 }
 
 export default function Page() {
-  const { data: user } = useSWR('api/user/verify', fetchParsed, { suspense: true })
+  const { data: user } = useSWR(['api/user/verify', 'POST'], ([url, method]) => fetchParsed(url, {method: method}), { suspense: true })
 
   const [tab, setTab] = useState(0);
 

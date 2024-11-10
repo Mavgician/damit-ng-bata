@@ -122,7 +122,7 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
 
   const toggle = () => setIsOpen(!isOpen);
 
-  const { data: firestoreUser } = useSWR('api/user/verify', fetchParsed, { suspense: true })
+  const { data: firestoreUser } = useSWR(['api/user/verify', 'POST'], ([url, method]) => fetchParsed(url, {method: method}), { suspense: true })
   const user = getUserCS()
 
   return (
