@@ -7,15 +7,31 @@ import { fetchCollectionItems } from '@/api/fetch_functions'
 import { getAppSS, getUserSS } from "firebase-nextjs/server/auth";
 import { getAuth } from 'firebase-admin/auth';
 
-export async function POST(req, { params }) {
+async function init(req) {
     const app = await getAppSS()
 
     let currentUser = await getUserSS()
-    let body
+    let body, newUserdata
 
     try {
         body = await req.json()
         currentUser = currentUser ?? await getAuth(app).verifySessionCookie(body?.token)
+
+        newUserdata = {
+            creation: Timestamp.now(),
+            email: currentUser.email,
+            locations: [],
+            name: {
+                display: body?.display_name ?? null,
+                first: body?.first_name ?? null,
+                last: body?.last_name ?? null
+            },
+            orders: [],
+            ratings: [],
+            cart: [],
+            type: 'user'
+        }
+
     } catch {
         console.warn('Request body is not set.')
     }
@@ -24,28 +40,19 @@ export async function POST(req, { params }) {
         return NextResponse.json({ error: 'User not logged in' }, { status: 401 })
     }
 
+    return ({currentUser, body, newUserdata})
+}
+
+export async function POST(req, { params }) {
+    const { currentUser, body, newUserdata } = await init(req)
+
     const document = doc(db, 'users', currentUser.uid)
     const userDocRaw = await getDoc(document)
     const userDoc = userDocRaw.data()
 
-    const newUserdata = {
-        creation: Timestamp.now(),
-        email: currentUser.email,
-        locations: [],
-        name: {
-            display: body?.display_name ?? null,
-            first: body?.first_name ?? null,
-            last: body?.last_name ?? null
-        },
-        orders: [],
-        ratings: [],
-        cart: [],
-        type: 'user'
-    }
-
     try {
         switch (params.slug) {
-            case 'new':
+            case 'add':
                 await setDoc(document, newUserdata)
                 break;
 
