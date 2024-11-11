@@ -15,10 +15,9 @@ import {
 import useSWR from "swr";
 
 export default function CartPage() {
-  const { data: items } = useSWR(['/api/user/cart'], fetchParsed, { suspense: true })
+  /* const { data: items } = useSWR(['/api/user/cart'], fetchParsed, { suspense: true })
 
-  console.log(items);
-  
+  console.log(items); */
 
   const [cartItems, setCartItems] = useState([
     {

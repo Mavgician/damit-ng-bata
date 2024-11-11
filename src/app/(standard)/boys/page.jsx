@@ -2,8 +2,18 @@
 
 import { Container, Row, Col } from 'reactstrap';
 import Link from 'next/link';
+import useSWR from 'swr';
+import { fetchParsed } from '@/src/lib/DataServer';
 
 export default function Page() {
+  const { data, isLoading } = useSWR(['api/product/list'],
+    ([url]) => fetchParsed(url, 'POST', JSON.stringify({
+      order: 'creation',
+      limit: 10,
+    })))
+
+  console.log(data, isLoading);
+
   return (
     <main>
       <section className="banner">

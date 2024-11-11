@@ -36,20 +36,20 @@ async function init(req) {
         console.warn('Request body is not set.')
     }
 
-    if (!currentUser) {
-        return NextResponse.json({ error: 'User not logged in' }, { status: 401 })
-    }
-
     return ({currentUser, body, newUserdata})
 }
 
 export async function POST(req, { params }) {
     const { currentUser, body, newUserdata } = await init(req)
 
+    if (!currentUser) {
+        return NextResponse.json({ error: 'User not logged in' }, { status: 401 })
+    }
+
     const document = doc(db, 'users', currentUser.uid)
     const userDocRaw = await getDoc(document)
     const userDoc = userDocRaw.data()
-
+    
     try {
         switch (params.slug) {
             case 'add':
