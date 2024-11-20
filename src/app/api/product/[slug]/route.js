@@ -1,39 +1,101 @@
 import { db } from '@/firebase-app-config.js'
-import { addDoc, collection, doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
+
+import { v2 as cloudinary } from 'cloudinary';
 
 import { fetchCollectionItems } from '@/api/fetch_functions'
 
-export async function POST(req, { params }) {
-  const collectionRef = collection(db, 'products')
+const collectionRef = collection(db, 'products')
 
-  let body, newProductData
+async function init(req) {
+  let body, newProductData, new_carouselurls = []
 
   try {
     body = await req.json()
-
-    newProductData = {
-      carouselurls: [...body.carouselurls],
-      description: body.description,
-      is_available: body.is_available,
-      name: body.name,
-      price: body.price,
-      tags: [...body.tags],
-      thmburl: body.thumbnail,
-      type: [...body.type],
-    }
   } catch {
     console.warn('Request body is not set.')
   }
 
   try {
+    newProductData = {
+      carouselurls: body.carouselurls,
+      description: body.description,
+      is_available: body.is_available,
+      name: body.name,
+      price: body.price,
+      tags: body.tags,
+      thmburl: body.thumbnail,
+      type: body.type,
+      creation: body.creation
+    }
+
+    for (let i = 0; i < newProductData.carouselurls.length; i++) {
+      const image = newProductData.carouselurls[i]
+
+      let uploadResult
+
+      if (image.url) {
+        const existing = await fetch(image.url)
+
+        if (existing.status === 200) {
+          new_carouselurls.push(image)
+          continue
+        }
+      }
+
+      uploadResult = await cloudinary.uploader.upload(
+        image?.content ?? image.url,
+        {
+          upload_preset: 'unsigned_productimg',
+          api_key: process.env.CLOUDINARY_API_KEY,
+          public_id: image.id ?? `${newProductData.name}-${image.name}-${i}`,
+        }
+      )
+
+      new_carouselurls.push(
+        {
+          url: uploadResult.secure_url,
+          id: uploadResult.public_id
+        }
+      )
+    }
+
+    newProductData.carouselurls = new_carouselurls
+
+  } catch {
+    console.warn('Request body is not for submission.')
+  }
+
+  return ({ body, newProductData })
+}
+
+export async function POST(req, { params }) {
+  const { body, newProductData } = await init(req)
+
+  try {
     switch (params.slug) {
       case 'add':
-        await addDoc(collectionRef, {...newProductData, creation: Timestamp.now(), last_modified: Timestamp.now()})
+        await addDoc(
+          collectionRef,
+          {
+            ...newProductData,
+            thmburl: newProductData.carouselurls[0],
+            creation: Timestamp.now(),
+            last_modified: Timestamp.now()
+          })
         break
 
       case 'update':
-        await setDoc(doc(collectionRef, body.productID), {...newProductData, last_modified: Timestamp.now()})
+        newProductData.thmburl = newProductData.carouselurls[0]
+
+        await setDoc(
+          doc(collectionRef, body.id),
+          {
+            ...newProductData,
+            creation: new Timestamp(newProductData.creation.seconds, newProductData.creation.nanoseconds),
+            last_modified: Timestamp.now()
+          })
         break
 
       case 'list':
@@ -42,7 +104,7 @@ export async function POST(req, { params }) {
         return NextResponse.json(items, { status: 200 })
 
       case 'item':
-        const document = doc(collectionRef, body.productID)
+        const document = doc(collectionRef, body.id)
         const product = (await getDoc(document)).data()
 
         return NextResponse.json({ ...product }, { status: 200 })
@@ -52,7 +114,28 @@ export async function POST(req, { params }) {
     }
   } catch (error) {
     console.log(error);
-    return NextResponse.json({ error: 'Wrong request body' }, { status: 500 })
+    
+
+    return NextResponse.json({ error: 'Wrong request', message: error }, { status: 500 })
+  }
+
+  return NextResponse.json({ message: 'success' }, { status: 200 })
+}
+
+export async function DELETE(req, { params }) {
+  const { body } = await init(req)
+
+  try {
+    switch (params.slug) {
+      case 'item':
+        await deleteDoc(doc(collectionRef, body.id))
+        break
+
+      default:
+        return NextResponse.json({ error: 'Unknown fetch type' }, { status: 501 })
+    }
+  } catch (error) {
+    return NextResponse.json({ error: 'Wrong request', message: error }, { status: 500 })
   }
 
   return NextResponse.json({ message: 'success' }, { status: 200 })

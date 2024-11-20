@@ -19,15 +19,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useContext, useEffect, useState } from 'react';
 
-import { setDoc, Timestamp } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { createContext } from 'react';
 import { fetchParsed } from '@/src/lib/DataServer';
 
 import { SetProduct, SetUser } from './modals'
 
+import { ConfirmationModal } from '@/src/components/modal_template';
+
 import useSWR from 'swr';
 
 const AdminTableData = createContext(null)
+const ConfirmModalContext = createContext(null)
 
 export default function Page() {
   const [tab, setTab] = useState(0);
@@ -75,7 +78,15 @@ function AdminModule({ children, url }) {
 
   const [modalData, setModalData] = useState(undefined);
 
-  const { data, isLoading } = useSWR(
+  const [submit, setSubmitfunc] = useState(() => () => { });
+  const [cancel, setCancelFunc] = useState(() => () => { setModalData(undefined) });
+
+  const [submitData, setSubmitData] = useState({});
+  const [submitType, setSubmitType] = useState('add');
+
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
+
+  const { data, isLoading, mutate } = useSWR(
     [url, orderBy, limit, firstDoc, lastDoc],
     ([url, order, limit, firstDoc, lastDoc]) => fetchParsed(url, {
       method: 'POST',
@@ -97,11 +108,22 @@ function AdminModule({ children, url }) {
     prev,
     setIsOpen,
     setModalData,
+    setSubmitfunc,
+    setCancelFunc,
+    setSubmitData,
+    setSubmitType,
     modalData,
     isOpen,
     pageNumber,
     maxPage,
-    data
+    data,
+    submit,
+    cancel,
+    submitData,
+    submitType,
+    refetch: mutate,
+    isSubmitLoading,
+    setIsSubmitLoading
   }
 
   function next() {
@@ -140,11 +162,12 @@ function AdminModule({ children, url }) {
 }
 
 function TableControls({ setLimit, setOrderBy, next, prev }) {
-  const { data, pageNumber, maxPage, setIsOpen, isOpen, setModalData } = useContext(AdminTableData)
+  const { data, pageNumber, maxPage, setIsOpen, isOpen, setModalData, setSubmitType } = useContext(AdminTableData)
 
   function addItem() {
-    setModalData(undefined)
+    setModalData(null)
     setIsOpen(!isOpen)
+    setSubmitType('add')
   }
 
   return (
@@ -189,10 +212,18 @@ function TableControls({ setLimit, setOrderBy, next, prev }) {
 }
 
 function Accounts() {
-  const { setLimit, setOrderBy, next, prev, data: users } = useContext(AdminTableData)
+  const {
+    setLimit,
+    setOrderBy,
+    next,
+    prev,
+    data: users,
+    setIsOpen
+  } = useContext(AdminTableData)
 
   return (
     <>
+      <SetUser context={AdminTableData}/>
       <div className="d-flex align-items-center mb-3">
         <h4 className='m-0'>Manage User Accounts</h4>
         <TableControls setLimit={setLimit} setOrderBy={setOrderBy} next={next} prev={prev} />
@@ -200,12 +231,12 @@ function Accounts() {
       <Table hover responsive className='p-3'>
         <thead>
           <tr>
-            <th className='col-2'>ID</th>
-            <th className='col-2'>Email</th>
-            <th className='col-2'>Display Name</th>
-            <th className='col-2'>Created on</th>
+            <th className='col-1'>ID</th>
+            <th className='col-3'>Email</th>
+            <th className='col-3'>Display Name</th>
             <th className='col-1'>Type</th>
-            <th className='col-1'>Orders</th>
+            <th className='col-1'>Created on</th>
+            <th className='col-1'>Last Modified</th>
             <th className='col-2'>Actions</th>
           </tr>
         </thead>
@@ -223,23 +254,26 @@ function Accounts() {
                   <span>{data.name.display}</span>
                 </td>
                 <td className='text-muted'>
-                  <span>{(new Timestamp(data.creation.seconds, data.creation.nanoseconds)).toDate().toUTCString()}</span>
-                </td>
-                <td className='text-muted'>
                   <span>{data.type}</span>
                 </td>
                 <td className='text-muted'>
-                  <Button outline color='success' size='sm' className='mx-1' onClick={() => { setIsOpen(false) }}>
-                    View Orders
-                  </Button>
+                  <span>{(new Timestamp(data.creation.seconds, data.creation.nanoseconds)).toDate().toUTCString()}</span>
                 </td>
                 <td className='text-muted'>
-                  <Button outline color='danger' size='sm' className='mx-1' onClick={() => { setIsOpen(false) }}>
-                    <FontAwesomeIcon icon={faTrash} />
-                  </Button>
-                  <Button outline color='primary' size='sm' className='mx-1' onClick={() => { setIsOpen(false) }}>
-                    <FontAwesomeIcon icon={faPen} />
-                  </Button>
+                  <span>{(new Timestamp(data.creation.seconds, data.creation.nanoseconds)).toDate().toUTCString()}</span>
+                </td>
+                <td className='text-muted'>
+                  <div className="d-flex">
+                    <Button outline color='danger' size='sm' className='mx-1' onClick={() => { setIsOpen(false) }}>
+                      <FontAwesomeIcon icon={faTrash} />
+                    </Button>
+                    <Button outline color='primary' size='sm' className='mx-1' onClick={() => { setIsOpen(false) }}>
+                      <FontAwesomeIcon icon={faPen} />
+                    </Button>
+                    <Button outline color='success' size='sm' className='mx-1' onClick={() => { setIsOpen(false) }}>
+                      View Orders
+                    </Button>
+                  </div>
                 </td>
               </tr>
             )
@@ -251,16 +285,84 @@ function Accounts() {
 }
 
 function Products() {
-  const { setLimit, setOrderBy, next, prev, data: products, setIsOpen, isOpen, setModalData } = useContext(AdminTableData)
+  const {
+    setLimit,
+    setOrderBy,
+    next,
+    prev,
+    data: products,
+    setIsOpen,
+    setModalData,
+    setSubmitfunc,
+    submitData,
+    setSubmitType,
+    submitType,
+    refetch,
+    isSubmitLoading,
+    setIsSubmitLoading
+  } = useContext(AdminTableData)
 
-  function edit(id) {
-    setModalData(id)
-    setIsOpen(!isOpen)
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [id, setId] = useState('');
+
+  async function submit(data, type) {
+    if (isSubmitLoading) return
+
+    setIsSubmitLoading(true)
+
+    await fetch(
+      `api/product/${type}`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }
+    )
+
+    setIsOpen(false)
+    setIsSubmitLoading(false)
+    await refetch()
   }
+
+  function edit(data) {
+    setModalData(data)
+    setIsOpen(true)
+    setSubmitType('update')
+  }
+
+  async function removeConfirm(id) {
+    setId(id)
+    setConfirmModal(true)
+  }
+
+  async function removeDoc() {
+    if (isSubmitLoading) return
+    setIsSubmitLoading(true)
+
+    await fetch(
+      'api/product/item',
+      {
+        method: 'DELETE',
+        body: JSON.stringify({ id: id })
+      }
+    )
+
+    setConfirmModal(false)
+    setIsSubmitLoading(false)
+    refetch()
+  }
+
+  useEffect(() => {
+    setSubmitfunc(() => () => { submit(submitData, submitType) })
+  }, [submitData, submitType]);
 
   return (
     <>
       <SetProduct context={AdminTableData} />
+      <ConfirmModalContext.Provider value={{ isOpen: confirmModal, setIsOpen: setConfirmModal, cancel: () => { }, submit: removeDoc }}>
+        <ConfirmationModal context={ConfirmModalContext}>
+          You will be deleting this product with id of <b>{id}</b>.
+        </ConfirmationModal>
+      </ConfirmModalContext.Provider>
       <div className="d-flex align-items-center mb-3">
         <h4 className='m-0'>Manage Products</h4>
         <TableControls setLimit={setLimit} setOrderBy={setOrderBy} next={next} prev={prev} />
@@ -268,12 +370,14 @@ function Products() {
       <Table hover responsive className='p-3'>
         <thead>
           <tr>
-            <th className='col-2'>ID</th>
+            <th className='col-1'>ID</th>
             <th className='col-2'>Product Name</th>
-            <th className='col-3'>Cateory</th>
-            <th className='col-2'>Created on</th>
-            <th className='col-1'>Ratings</th>
-            <th className='col-2'>Actions</th>
+            <th className='col-2'>Categories</th>
+            <th className='col-2'>Types</th>
+            <th className='col-2'>Ratings</th>
+            <th className='col-1'>Created on</th>
+            <th className='col-1'>Last modified</th>
+            <th className='col-1'>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -287,19 +391,37 @@ function Products() {
                   <span>{data.name}</span>
                 </td>
                 <td className='text-muted'>
-                  <span>{data.tags.join(', ')}</span>
+                  <span>
+                    {
+                      data.tags.length > 0 ?
+                        data.tags.join(', ')
+                        :
+                        <span className='fst-italic'>No tags defined</span>
+                    }
+                  </span>
+                </td>
+                <td className='text-muted'>
+                  {
+                    data.type.length > 0 ?
+                      data.type.map(data => `${Object.keys(data)[0]}, `)
+                      :
+                      <span className='fst-italic'>No types defined</span>
+                  }
+                </td>
+                <td className='text-muted'>
+
                 </td>
                 <td className='text-muted'>
                   <span>{(new Timestamp(data.creation.seconds, data.creation.nanoseconds)).toDate().toUTCString()}</span>
                 </td>
                 <td className='text-muted'>
-                  
+                  <span>{(new Timestamp(data.last_modified.seconds, data.last_modified.nanoseconds)).toDate().toUTCString()}</span>
                 </td>
                 <td className='text-muted'>
-                  <Button outline color='danger' size='sm' className='mx-1' onClick={() => { setIsOpen(false) }}>
+                  <Button outline color='danger' size='sm' className='mx-1' onClick={() => { removeConfirm(data.id) }}>
                     <FontAwesomeIcon icon={faTrash} />
                   </Button>
-                  <Button outline color='primary' size='sm' className='mx-1' onClick={() => { edit(data.id) }}>
+                  <Button outline color='primary' size='sm' className='mx-1' onClick={() => { edit(data) }}>
                     <FontAwesomeIcon icon={faPen} />
                   </Button>
                 </td>
