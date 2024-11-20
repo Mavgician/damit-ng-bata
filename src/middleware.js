@@ -45,18 +45,17 @@ export default async function middleware(req) {
                 })
             }
         )
-        .then(data => data.json())
-        const isAdmin = user?.type == 'admin'
 
-        console.info('User is admin: ' + isAdmin)
-
-        if (AUTH_PATHS.includes(path) && user.status == 404) {
+        if (AUTH_PATHS.includes(path) && !user.ok) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
         }
 
         if (AUTH_PATHS.includes(path)) {
             return NextResponse.redirect(new URL(target, req.nextUrl));
         }
+
+        const isAdmin = (await user.json())?.type == 'admin'
+        console.info('User is admin: ' + isAdmin)
 
         if (ADMIN_PATHS.includes(path) && isAdmin) {
             return NextResponse.next()
