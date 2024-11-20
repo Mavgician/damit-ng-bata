@@ -47,7 +47,7 @@ export default async function middleware(req) {
             }
         )
 
-        const isAdmin = ADMIN_PATHS.includes(path) && (await verifyUser.json()).type === 'admin'
+        const isAdmin = (await verifyUser.json())?.type === 'admin'
 
         if (AUTH_PATHS.includes(path) && verifyUser.status == 404) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
