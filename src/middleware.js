@@ -38,7 +38,7 @@ export default async function middleware(req) {
         const cookieStore = cookies()
         const token = cookieStore.get('firebase_nextjs_token')
         const user = await fetchParsed(
-            new URL('api/user/verify', req.nextUrl.origin),
+            req.nextUrl.origin + '/api/user/verify',
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -48,7 +48,7 @@ export default async function middleware(req) {
             }
         )
 
-        console.log(user);
+        console.log(req.nextUrl.origin + '/api/user/verify');
 
         const isAdmin = user?.type == 'admin'
         console.info('User is admin: ' + isAdmin)
