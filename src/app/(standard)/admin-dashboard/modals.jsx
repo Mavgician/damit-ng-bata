@@ -60,8 +60,8 @@ export function SetProduct({ context }) {
     setIsAvailable(data?.is_available ?? false)
     setTags(data?.tags ?? [])
     setTypes(data?.type ?? [])
-    setPrice(data?.price ?? 0),
-      setProductImages(data?.carouselurls ?? [])
+    setPrice(data?.price ?? 0)
+    setProductImages(data?.carouselurls ?? [])
   }, [data]);
 
   useEffect(() => {
