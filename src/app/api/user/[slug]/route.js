@@ -44,7 +44,7 @@ export async function POST(req, { params }) {
     const { currentUser, body, newUserdata } = await init(req)
 
     if (!currentUser) {
-        return NextResponse.json({ error: 'User not logged in' }, { status: 401 })
+        return NextResponse.json({ message: 'User not logged in' }, { status: 401 })
     }
 
     const document = doc(db, 'users', currentUser.uid)

@@ -45,13 +45,11 @@ export default async function middleware(req) {
                 })
             }
         )
-        console.log(user.status);
         
-
         const isAdmin = (await user.json())?.type == 'admin'
         console.info('User is admin: ' + isAdmin)
 
-        if (AUTH_PATHS.includes(path) && !user.ok) {
+        if (AUTH_PATHS.includes(path) && user.status == 404) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
         }
 
