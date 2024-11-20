@@ -1,5 +1,5 @@
 import { CookieListItem } from "next/dist/compiled/@edge-runtime/cookies";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 interface fetchParams {
   method: string;
@@ -17,9 +17,9 @@ export const fetchParsed = async (url: string, fetchParams: fetchParams = {metho
   }
 }
 
-export const verifyUser = async (req: NextRequest, token: CookieListItem) => {
+export const verifyUser = async (url: string, token: CookieListItem) => {
   const user = await fetch(
-      `${req.nextUrl.origin}/api/user/verify`,
+      'https://localhost:3000/api/user/verify',
       {
           method: 'POST',
           body: JSON.stringify({
@@ -29,5 +29,5 @@ export const verifyUser = async (req: NextRequest, token: CookieListItem) => {
       }
   )
 
-  return user.json()
+  return /* user.json() */
 }
