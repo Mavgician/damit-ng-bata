@@ -36,7 +36,7 @@ export default async function middleware(req) {
         const cookieStore = cookies()
         const token = cookieStore.get('firebase_nextjs_token')
         const user = await fetch(
-            new URL('api/user/verify', req.nextUrl),
+            new URL('api/user/verify', `https://${process.env.VERCEL_URL}`),
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -45,6 +45,10 @@ export default async function middleware(req) {
                 })
             }
         )
+        const isAdmin = (await user.json())?.type == 'admin'
+        console.info('User is admin: ' + isAdmin)
+
+        console.log(req.nextUrl);
 
         if (AUTH_PATHS.includes(path) && !user.ok) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
@@ -53,9 +57,6 @@ export default async function middleware(req) {
         if (AUTH_PATHS.includes(path)) {
             return NextResponse.redirect(new URL(target, req.nextUrl));
         }
-
-        const isAdmin = (await user.json())?.type == 'admin'
-        console.info('User is admin: ' + isAdmin)
 
         if (ADMIN_PATHS.includes(path) && isAdmin) {
             return NextResponse.next()
