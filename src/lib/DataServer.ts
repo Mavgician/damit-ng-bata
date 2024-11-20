@@ -1,4 +1,3 @@
-import { CookieListItem } from "next/dist/compiled/@edge-runtime/cookies";
 import { NextResponse } from "next/server";
 
 interface fetchParams {
@@ -15,19 +14,4 @@ export const fetchParsed = async (url: string, fetchParams: fetchParams = {metho
   } catch (error) {
     return NextResponse.json({message: 'Cannot parse response', stack: error}, { status: 500 })
   }
-}
-
-export const verifyUser = async (url: string, token: CookieListItem) => {
-  const user = await fetch(
-      'https://localhost:3000/api/user/verify',
-      {
-          method: 'POST',
-          body: JSON.stringify({
-              isLogin: true,
-              token: token.value
-          })
-      }
-  )
-
-  return /* user.json() */
 }
