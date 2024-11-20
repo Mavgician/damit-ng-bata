@@ -46,8 +46,7 @@ export default async function middleware(req) {
                 })
             }
         )
-        console.log(`Verify user request url: ${req.nextUrl.origin}/api/user/verify`)
-        console.log(verifyUser.status);
+        console.log(verifyUser);
         const user = await verifyUser.json()
         const isAdmin = ADMIN_PATHS.includes(path) && user?.type == 'admin'
 
