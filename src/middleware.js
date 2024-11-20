@@ -31,7 +31,7 @@ async function verifyUser(req, token) {
         }
     )
 
-    return await user.json()
+    return user.json()
 }
 
 export default async function middleware(req) {
