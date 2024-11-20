@@ -47,9 +47,6 @@ export default async function middleware(req) {
         )
         const isAdmin = user?.type == 'admin'
 
-        console.log(await user.text());
-        console.log(await user.json());
-
         console.info('User is admin: ' + isAdmin)
 
         if (AUTH_PATHS.includes(path) && user.status == 404) {
