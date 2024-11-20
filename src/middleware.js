@@ -47,6 +47,9 @@ export default async function middleware(req) {
                 })
             }
         )
+
+        console.log(user);
+
         const isAdmin = user?.type == 'admin'
         console.info('User is admin: ' + isAdmin)
 
