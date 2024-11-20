@@ -21,7 +21,7 @@ const rule = new RegExp(options.allowRule)
 
 async function verifyUser(url, token) {
     const user = await fetch(
-        `https://${url}/api/user/verify`,
+        url,
         {
             method: 'POST',
             body: JSON.stringify({
@@ -38,20 +38,22 @@ export default async function middleware(req) {
     const path = req.nextUrl.pathname;
     const loggedIn = await checkUser();
 
-    console.log('current path: ' + path);
+    console.info('current path: ' + path);
     
     if (path.split('/').includes('api')) {
         return NextResponse.next()
     }
-
+    
     // Check if authenticated user has the correct roles.
     if (loggedIn) {
         const target = req.nextUrl.searchParams.get('target') ?? "/"
 
         const cookieStore = cookies()
         const token = cookieStore.get('firebase_nextjs_token')
-        const user = await verifyUser(process.env.VERCEL_URL, token)
+        const user = await verifyUser(new URL('api/user/verify', req.nextUrl), token)
         const isAdmin = user?.type == 'admin'
+
+        console.info('User is admin: ' + isAdmin)
 
         if (AUTH_PATHS.includes(path) && verifyUser.status == 404) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
