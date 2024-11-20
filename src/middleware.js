@@ -33,13 +33,10 @@ export default async function middleware(req) {
     if (loggedIn) {
         const target = req.nextUrl.searchParams.get('target') ?? "/"
 
-        console.log(req.nextUrl);
-        console.log(process.env.VERCEL_URL);
-
         const cookieStore = cookies()
         const token = cookieStore.get('firebase_nextjs_token')
         const user = await fetch(
-            new URL('api/user/verify', `https://${process.env.VERCEL_URL}`),
+            new URL('api/user/verify', req.nextUrl.origin),
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -48,6 +45,9 @@ export default async function middleware(req) {
                 })
             }
         )
+        console.log(user.status);
+        
+
         const isAdmin = (await user.json())?.type == 'admin'
         console.info('User is admin: ' + isAdmin)
 
