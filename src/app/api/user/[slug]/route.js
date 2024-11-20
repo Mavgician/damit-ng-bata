@@ -19,6 +19,7 @@ async function init(req) {
 
         newUserdata = {
             creation: Timestamp.now(),
+            last_modified: Timestamp.now(),
             email: currentUser.email,
             locations: [],
             name: {
