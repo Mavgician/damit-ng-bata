@@ -45,9 +45,12 @@ export default async function middleware(req) {
                     token: token.value
                 })
             }
-        ).then(async (e) => {console.log(await e.text())})
+        )
         /* const user = await verifyUser.json() */
         const isAdmin = /* user?.type == 'admin' */ false
+
+        console.log(verifyUser);
+        
 
         if (AUTH_PATHS.includes(path) && verifyUser.status == 404) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
