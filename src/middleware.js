@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers'
+import { verifyUser } from '@/lib/DataServer'
 
 import checkUser from 'firebase-nextjs/middleware/check-user'
 
@@ -18,21 +19,6 @@ const ADMIN_PATHS = [
 ]
 
 const rule = new RegExp(options.allowRule)
-
-async function verifyUser(req, token) {
-    const user = await fetch(
-        `${req.nextUrl.origin}/api/user/verify`,
-        {
-            method: 'POST',
-            body: JSON.stringify({
-                isLogin: true,
-                token: token.value
-            })
-        }
-    )
-
-    return user.json()
-}
 
 export default async function middleware(req) {
     const path = req.nextUrl.pathname;
