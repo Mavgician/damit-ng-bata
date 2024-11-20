@@ -33,6 +33,9 @@ export default async function middleware(req) {
     if (loggedIn) {
         const target = req.nextUrl.searchParams.get('target') ?? "/"
 
+        console.log(req.nextUrl);
+        console.log(process.env.VERCEL_URL);
+
         const cookieStore = cookies()
         const token = cookieStore.get('firebase_nextjs_token')
         const user = await fetch(
@@ -47,8 +50,6 @@ export default async function middleware(req) {
         )
         const isAdmin = (await user.json())?.type == 'admin'
         console.info('User is admin: ' + isAdmin)
-
-        console.log(req.nextUrl);
 
         if (AUTH_PATHS.includes(path) && !user.ok) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
