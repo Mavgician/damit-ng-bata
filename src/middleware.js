@@ -19,21 +19,6 @@ const ADMIN_PATHS = [
 
 const rule = new RegExp(options.allowRule)
 
-async function verifyUser(url, token) {
-    const user = await fetch(
-        url,
-        {
-            method: 'POST',
-            body: JSON.stringify({
-                isLogin: true,
-                token: token.value
-            })
-        }
-    )
-
-    return user.json()
-}
-
 export default async function middleware(req) {
     const path = req.nextUrl.pathname;
     const loggedIn = await checkUser();
@@ -50,12 +35,24 @@ export default async function middleware(req) {
 
         const cookieStore = cookies()
         const token = cookieStore.get('firebase_nextjs_token')
-        const user = await verifyUser(new URL('api/user/verify', req.nextUrl), token)
+        const user = await fetch(
+            new URL('api/user/verify', req.nextUrl),
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    isLogin: true,
+                    token: token.value
+                })
+            }
+        )
         const isAdmin = user?.type == 'admin'
+
+        console.log(await user.text());
+        console.log(await user.json());
 
         console.info('User is admin: ' + isAdmin)
 
-        if (AUTH_PATHS.includes(path) && verifyUser.status == 404) {
+        if (AUTH_PATHS.includes(path) && user.status == 404) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
         }
 
