@@ -37,7 +37,7 @@ export default async function middleware(req) {
         const cookieStore = cookies()
         const token = cookieStore.get('firebase_nextjs_token')
         const verifyUser = await fetch(
-            new URL('/api/user/verify', req.nextUrl),
+            `${req.nextUrl.origin}/api/user/verify`,
             {
                 method: 'POST',
                 body: JSON.stringify({
