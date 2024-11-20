@@ -19,13 +19,27 @@ const ADMIN_PATHS = [
 
 const rule = new RegExp(options.allowRule)
 
+async function verifyUser(req, token) {
+    const user = await fetch(
+        `${req.nextUrl.origin}/api/user/verify`,
+        {
+            method: 'POST',
+            body: JSON.stringify({
+                isLogin: true,
+                token: token.value
+            })
+        }
+    )
+
+    return await user.json()
+}
+
 export default async function middleware(req) {
     const path = req.nextUrl.pathname;
     const loggedIn = await checkUser();
 
     console.log('current path: ' + path);
     
-
     if (path.split('/').includes('api')) {
         return NextResponse.next()
     }
@@ -33,24 +47,11 @@ export default async function middleware(req) {
     // Check if authenticated user has the correct roles.
     if (loggedIn) {
         const target = req.nextUrl.searchParams.get('target') ?? "/"
-    
+
         const cookieStore = cookies()
         const token = cookieStore.get('firebase_nextjs_token')
-        const verifyUser = await fetch(
-            `${req.nextUrl.origin}/api/user/verify`,
-            {
-                method: 'POST',
-                body: JSON.stringify({
-                    isLogin: true,
-                    token: token.value
-                })
-            }
-        )
-        /* const user = await verifyUser.json() */
-        const isAdmin = /* user?.type == 'admin' */ false
-
-        console.log(verifyUser);
-        
+        const user = await verifyUser(req, token)
+        const isAdmin = user?.type == 'admin'
 
         if (AUTH_PATHS.includes(path) && verifyUser.status == 404) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
