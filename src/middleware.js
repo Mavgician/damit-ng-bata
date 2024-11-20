@@ -21,7 +21,7 @@ const rule = new RegExp(options.allowRule)
 
 async function verifyUser(url, token) {
     const user = await fetch(
-        `http://${url}/api/user/verify`,
+        `https://${url}/api/user/verify`,
         {
             method: 'POST',
             body: JSON.stringify({
