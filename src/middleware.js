@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers'
 
+import { fetchParsed } from '@/lib/DataServer'
+
 import checkUser from 'firebase-nextjs/middleware/check-user'
 
 const options = {
@@ -35,7 +37,7 @@ export default async function middleware(req) {
 
         const cookieStore = cookies()
         const token = cookieStore.get('firebase_nextjs_token')
-        const user = await fetch(
+        const user = await fetchParsed(
             new URL('api/user/verify', req.nextUrl.origin),
             {
                 method: 'POST',
@@ -45,8 +47,7 @@ export default async function middleware(req) {
                 })
             }
         )
-        
-        const isAdmin = (await user.json())?.type == 'admin'
+        const isAdmin = user?.type == 'admin'
         console.info('User is admin: ' + isAdmin)
 
         if (AUTH_PATHS.includes(path) && user.status == 404) {
