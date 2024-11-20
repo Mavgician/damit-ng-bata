@@ -61,7 +61,7 @@ export function SetProduct({ context }) {
     setTags(data?.tags ?? [])
     setTypes(data?.type ?? [])
     setPrice(data?.price ?? 0),
-    setProductImages(data?.carouselurls ?? [])
+      setProductImages(data?.carouselurls ?? [])
   }, [data]);
 
   useEffect(() => {
@@ -157,7 +157,7 @@ export function SetProduct({ context }) {
                 placeholder='price'
                 type='checkbox'
                 checked={isAvailable}
-                onChange={(e) => setIsAvailable(!isAvailable)
+                onChange={() => setIsAvailable(!isAvailable)
                 }
               />
               <Label className="ms-2">Is Available</Label>
@@ -231,8 +231,14 @@ export function SetProduct({ context }) {
   )
 }
 
-export function SetUser({ isOpen, toggle, data, id }) {
+export function SetUser({ context }) {
+  /* const { modalData: data, setSubmitData } = useContext(context) */
 
+  return (
+    <ModalFrame context={context} size="lg">
+
+    </ModalFrame>
+  )
 }
 
 function ProductTypes({ name, typeidx }) {

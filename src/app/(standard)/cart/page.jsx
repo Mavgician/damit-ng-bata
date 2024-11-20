@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchParsed } from "@/src/lib/DataServer";
+/* import { fetchParsed } from "@/src/lib/DataServer"; */
 import { useState } from "react";
 import {
   Container,
@@ -12,7 +12,7 @@ import {
   CardTitle,
   Input,
 } from "reactstrap";
-import useSWR from "swr";
+/* import useSWR from "swr"; */
 
 export default function CartPage() {
   /* const { data: items } = useSWR(['/api/user/cart'], fetchParsed, { suspense: true })
