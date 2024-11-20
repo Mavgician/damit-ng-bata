@@ -46,7 +46,7 @@ export default async function middleware(req) {
                 })
             }
         ).then(async (e) => {console.log(await e.json())})
-        const user = await verifyUser.json()
+        /* const user = await verifyUser.json() */
         const isAdmin = /* user?.type == 'admin' */ false
 
         if (AUTH_PATHS.includes(path) && verifyUser.status == 404) {
