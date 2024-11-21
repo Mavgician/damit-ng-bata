@@ -10,7 +10,7 @@ export const fetchParsed = async (url: string, fetchParams: fetchParams = {metho
   const { method, body } = fetchParams
 
   try {
-    return await fetch(url, {method: method, body}).then(data => {
+    return await fetch(url, {method: method, body: body}).then(data => {
       console.log(data);
       return data.json()
     })
