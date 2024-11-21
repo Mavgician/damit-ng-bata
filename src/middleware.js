@@ -46,7 +46,6 @@ export default async function middleware(req) {
             {
                 method: 'POST',
                 body: JSON.stringify({
-                    isLogin: true,
                     token: token.value
                 })
             }
