@@ -10,7 +10,10 @@ export const fetchParsed = async (url: string, fetchParams: fetchParams = {metho
   const { method, body } = fetchParams
 
   try {
-    return await fetch(url, {method: method, body}).then(data => data.json())
+    return await fetch(url, {method: method, body}).then(data => {
+      console.log(data);
+      return data.json()
+    })
   } catch (error) {
     console.error(error);
     return NextResponse.json({message: 'Cannot parse response', stack: error}, { status: 500 })
