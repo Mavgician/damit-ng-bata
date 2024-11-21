@@ -21,6 +21,10 @@ const ADMIN_PATHS = [
 
 const rule = new RegExp(options.allowRule)
 
+export const config = {
+    matcher: ['/login:path*', '/admin:path*', '/cart:path*', '/profile:path*', '/register/:path*'],
+}
+
 export default async function middleware(req) {
     const path = req.nextUrl.pathname;
     const loggedIn = await checkUser();
@@ -80,7 +84,3 @@ export default async function middleware(req) {
 
     return NextResponse.redirect(new URL('/login?target=' + path, req.nextUrl));
 }
-
-export const config = {
-    matcher: ['/login:path*', '/admin:path*', '/cart:path*', '/profile:path*'],
-};
