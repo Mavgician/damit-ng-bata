@@ -10,10 +10,6 @@ export const fetchParsed = async (url: string, fetchParams: fetchParams = {metho
   const { method, body } = fetchParams
   const res = await fetch(url, {method: method, body: body, headers: {'Content-Type': 'application/json'}})
 
-  console.log(res.status);
-  console.log(res.body);
-  
-
   try {
     return await res.json()
   } catch (error) {
