@@ -1,5 +1,3 @@
-import { NextResponse } from "next/server";
-
 interface fetchParams {
   method: string;
   body: BodyInit | undefined;

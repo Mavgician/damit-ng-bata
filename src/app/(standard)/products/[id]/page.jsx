@@ -12,7 +12,7 @@ import {
 } from 'reactstrap';
 
 import { fetchParsed } from '@/src/lib/DataServer';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import useSWR from 'swr';
 
@@ -151,7 +151,7 @@ export default function Page({ params }) {
               }
               <div className='d-flex align-items-center justify-content-end gap-1'>
                 <Button color="success" onClick={addcartbtn}>Add to Cart</Button>
-                <Button color="primary">Buy Now</Button>
+                <Button color="primary" onClick={buybtn}>Buy Now</Button>
               </div>
             </Col>
           </Row>
