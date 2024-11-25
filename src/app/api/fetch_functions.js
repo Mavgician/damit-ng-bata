@@ -5,6 +5,7 @@ import {
   getDoc,
   getDocs,
   limit,
+  limitToLast,
   orderBy,
   query,
   startAfter,
@@ -18,21 +19,21 @@ export async function fetchCollectionItems(collection, order, searchLimit = 10, 
   let initQuery
 
   if (filter) {
-    initQuery = query(collection, orderBy(order), limit(searchLimit), where(filter.field, filter.operator, filter.searchterm))
+    initQuery = query(collection, orderBy(order), where(filter.field, filter.operator, filter.searchterm))
   } else {
-    initQuery = query(collection, orderBy(order), limit(searchLimit))
+    initQuery = query(collection, orderBy(order))
   }
   
   const totalCount = await getCountFromServer(collection)
 
   if (firstDoc) {
       const cursor = await getDoc(doc(collection, firstDoc))
-      queryRef = query(initQuery, endBefore(cursor))
+      queryRef = query(initQuery, endBefore(cursor), limitToLast(searchLimit))
   } else if (lastDoc) {
       const cursor = await getDoc(doc(collection, lastDoc))
-      queryRef = query(initQuery, startAfter(cursor))
+      queryRef = query(initQuery, startAfter(cursor), limit(searchLimit))
   } else {
-      queryRef = initQuery
+      queryRef = query(initQuery, limit(searchLimit))
   }
 
   const snapshot = await getDocs(queryRef)
