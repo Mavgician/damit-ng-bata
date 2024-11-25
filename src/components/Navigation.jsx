@@ -119,10 +119,10 @@ function ProfileButtonTrigger({ user, size }) {
 export function Navigationbar({ transparent = false, isFixed = true }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-
+  
   const toggle = () => setIsOpen(!isOpen);
 
-  const { data: firestoreUser } = useSWR(['api/user/verify', 'POST'], ([url, method]) => fetchParsed(url, {method: method}), { suspense: true })
+  const { data: firestoreUser } = useSWR([`${window.location.origin}/api/user/verify`, 'POST'], ([url, method]) => fetchParsed(url, {method: method}), { suspense: true })
   const user = getUserCS()
 
   return (
@@ -145,7 +145,7 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
               <NavLink href='/boys'>Boys</NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href='/products/girls'>Girls</NavLink>
+              <NavLink href='/girls'>Girls</NavLink>
             </NavItem>
             <NavItem>
               <NavLink href='/cart'>Cart</NavLink>
