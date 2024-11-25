@@ -1,5 +1,5 @@
 import { db } from '@/firebase-app-config.js'
-import { collection, doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
+import { arrayUnion, collection, doc, getDoc, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 
 import { fetchCollectionItems } from '@/api/fetch_functions'
@@ -37,7 +37,7 @@ async function init(req) {
         console.warn('Request body is not set.')
     }
 
-    return ({currentUser, body, newUserdata})
+    return ({ currentUser, body, newUserdata })
 }
 
 export async function POST(req, { params }) {
@@ -50,7 +50,9 @@ export async function POST(req, { params }) {
     const document = doc(db, 'users', currentUser.uid)
     const userDocRaw = await getDoc(document)
     const userDoc = userDocRaw.data()
-    
+
+    let updated
+
     try {
         switch (params.slug) {
             case 'add':
@@ -58,7 +60,7 @@ export async function POST(req, { params }) {
                 break;
 
             case 'update':
-                const updated = {
+                updated = {
                     ...userDoc,
                     name: {
                         ...newUserdata.name
@@ -94,10 +96,51 @@ export async function POST(req, { params }) {
 
                 for (let i = 0; i < items.length; i++) {
                     const document = (await getDoc(doc(collectionRef, items[i].item.id))).data()
-                    itemsParsed.push({ item: document, quantity: items[i].quantity })
+                    itemsParsed.push({
+                        id: items[i].id,
+                        name: document.name,
+                        description: document.description,
+                        price: document.price,
+                        imageUrl: document.thmburl.url,
+                        quantity: items[i].quantity
+                    })
                 }
 
                 return NextResponse.json(itemsParsed, { status: 200 })
+
+            case 'add-cart':
+                await updateDoc(document, {
+                    cart: arrayUnion({
+                        item: doc(db, 'products', body.id),
+                        quantity: body.quantity,
+                        type: body.type,
+                        id: body.id
+                    })
+                })
+                break
+
+            case 'update-cart':
+                updated = { ...userDoc }
+
+                updated.cart.find((item, idx) => {
+                    if (item.id === body.id) {
+                        updated[idx] = {
+                            item: doc(db, 'products', body.id),
+                            quantity: body?.quantity ?? item.quantity,
+                            type: body?.type ?? item.type,
+                            id: item.id
+                        }
+                        return
+                    }
+                })
+
+                await setDoc(document, updated)
+                break
+
+            case 'remove-cart':
+                updated = { ...userDoc, cart: userDoc.cart.filter((item) => item.id != body.id) }
+                await setDoc(document, updated)
+                break
 
             default:
                 return NextResponse.json({ error: 'Unknown fetch type' }, { status: 501 })
