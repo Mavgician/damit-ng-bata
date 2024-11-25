@@ -54,7 +54,7 @@ export default async function middleware(req) {
         const isAdmin = user?.type == 'admin'
         console.info('User is admin: ' + isAdmin)
 
-        if (AUTH_PATHS.includes(path) && user.status == 404) {
+        if (user == undefined) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
         }
 
