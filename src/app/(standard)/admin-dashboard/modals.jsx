@@ -32,6 +32,8 @@ export function SetProduct({ context }) {
   const [tagName, setTagName] = useState('');
   const [typeName, setTypeName] = useState('');
 
+  const [category, setCategory] = useState('boys');
+
   const [productImages, setProductImages] = useState([]);
 
   const { openFilePicker, filesContent } = useFilePicker({
@@ -62,6 +64,7 @@ export function SetProduct({ context }) {
     setTypes(data?.type ?? [])
     setPrice(data?.price ?? 0)
     setProductImages(data?.carouselurls ?? [])
+    setCategory(data?.category ?? 'boys')
   }, [data]);
 
   useEffect(() => {
@@ -80,12 +83,13 @@ export function SetProduct({ context }) {
       tags: tags,
       type: types,
       id: data?.id ?? '',
+      category: category.toLowerCase(),
       creation: {
         seconds: data?.creation.seconds ?? 0,
         nanoseconds: data?.creation.nanoseconds ?? 0
       }
     })
-  }, [name, description, isAvailable, tags, types, price, productImages, filesContent, data]);
+  }, [name, description, isAvailable, tags, types, price, productImages, filesContent, category, data]);
 
   return (
     <ModalFrame context={context} size="lg">
@@ -99,7 +103,7 @@ export function SetProduct({ context }) {
               <div className="w-100 h-50 pt-3 d-flex align-items-center gap-2 overflow-auto">
                 {
                   productImages.length > 0 ?
-                    productImages.map((data, idx) => <img key={`productimg-$${idx}`} onClick={() => removeImage(idx)} src={data?.content ?? data.url} className="product-image" />)
+                    productImages.map((data, idx) => <img key={`productimg-$${idx}`} onClick={() => removeImage(idx)} src={data?.content ?? data.url} className="product-image-admin" />)
                     :
                     <div className="h-100 w-100 bg-secondary rounded d-flex justify-content-center align-items-center text-light">
                       Images will be shown here
@@ -146,6 +150,8 @@ export function SetProduct({ context }) {
               <Input
                 placeholder='Genre'
                 type='select'
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
               >
                 <option>Boys</option>
                 <option>Girls</option>
