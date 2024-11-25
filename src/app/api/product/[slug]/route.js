@@ -27,6 +27,7 @@ async function init(req) {
       tags: body.tags,
       thmburl: body.thumbnail,
       type: body.type,
+      category: body.category,
       creation: body.creation
     }
 
@@ -99,7 +100,18 @@ export async function POST(req, { params }) {
         break
 
       case 'list':
-        const items = await fetchCollectionItems(collectionRef, body.order, body.limit, body.firstDoc, body.lastDoc)
+        const items = await fetchCollectionItems(
+          collectionRef,
+          body.order,
+          body.limit,
+          body.firstDoc,
+          body.lastDoc,
+          body.category && {
+            field: 'category',
+            operator: '==',
+            searchterm: body.category
+          }
+        )
 
         return NextResponse.json(items, { status: 200 })
 
@@ -113,9 +125,7 @@ export async function POST(req, { params }) {
         return NextResponse.json({ error: 'Unknown fetch type' }, { status: 501 })
     }
   } catch (error) {
-    console.log(error);
-    
-
+    console.log(error)
     return NextResponse.json({ error: 'Wrong request', message: error }, { status: 500 })
   }
 

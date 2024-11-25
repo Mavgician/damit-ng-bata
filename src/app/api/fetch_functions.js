@@ -7,15 +7,22 @@ import {
   limit,
   orderBy,
   query,
-  startAfter
+  startAfter,
+  where
 } from 'firebase/firestore';
 
-export async function fetchCollectionItems(collection, order, searchLimit = 10, firstDoc, lastDoc) {
+export async function fetchCollectionItems(collection, order, searchLimit = 10, firstDoc, lastDoc, filter) {
   let data = []
   let queryRef
 
-  const initQuery = query(collection, orderBy(order), limit(searchLimit))
+  let initQuery
 
+  if (filter) {
+    initQuery = query(collection, orderBy(order), limit(searchLimit), where(filter.field, filter.operator, filter.searchterm))
+  } else {
+    initQuery = query(collection, orderBy(order), limit(searchLimit))
+  }
+  
   const totalCount = await getCountFromServer(collection)
 
   if (firstDoc) {
