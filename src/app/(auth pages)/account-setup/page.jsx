@@ -35,9 +35,9 @@ export default function Page() {
 
     setIsCreated(true)
 
-    router.replace('/')
+    await fetch('api/user/add', { method: 'POST' })
 
-    fetch(
+    await fetch(
       'api/user/update',
       {
         method: 'POST',
@@ -47,11 +47,9 @@ export default function Page() {
           first_name: firstName
         })
       })
-  }
 
-  useEffect(() => {
-    fetch('api/user/add', { method: 'POST' })
-  }, []);
+    router.replace('/')
+  }
 
   return (
     <main className='p-0 position-relative bg-light text-dark'>

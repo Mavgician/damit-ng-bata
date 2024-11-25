@@ -3,7 +3,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faGear, faBox, faShield } from '@fortawesome/free-solid-svg-icons';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Collapse,
   Navbar,
@@ -22,9 +22,11 @@ import { LogoutButton } from 'firebase-nextjs/client/components';
 import { fetchParsed } from '@/lib/DataServer';
 
 import useSWR from 'swr';
+import { useRouter } from 'next/navigation';
 
 function ProfilePopup({ user, firestoreUser }) {
   const imageUrl = user?.photoURL ?? "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=" + (user?.displayName ?? user?.email);
+  const router = useRouter()
 
   const popupStyle = {
     width: "calc(-40px + min(100vw, 370px))",
@@ -54,59 +56,71 @@ function ProfilePopup({ user, firestoreUser }) {
     marginRight: 5
   }
 
-  return <div style={popupStyle}>
-    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-      <img src={imageUrl} alt="profile" height={30} width={30} style={profilePopupImageStyle} />
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        {user?.displayName && <div style={{
-          fontSize: 15,
-          fontWeight: 500,
-          marginLeft: 8,
-          marginRight: 13,
-          marginBottom: 0,
-        }}>{firestoreUser.name.display}</div>}
-        <div style={{ fontSize: 14, color: "#00000088", marginLeft: 8, marginRight: 13 }}>{user?.email}</div>
-      </div>
-    </div>
-    <hr />
-    <div className='text-uppercase text-secondary'>
+  useEffect(() => {
+    if (firestoreUser?.name?.display === undefined) {
+      router.replace(`${window.location.origin}/account-setup`)
+    }
+  }, []);
+
+  return (
+    <>
       {
-        firestoreUser.type === 'admin' ?
-          <NavLink href='/admin-dashboard' className='px-3 py-2 profilePopoverLink'>
-            <div className='profilePopoverMenu'>
-              <FontAwesomeIcon style={icon} icon={faShield} />
+        firestoreUser?.name?.display && <div style={popupStyle}>
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+            <img src={imageUrl} alt="profile" height={30} width={30} style={profilePopupImageStyle} />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {user?.displayName && <div style={{
+                fontSize: 15,
+                fontWeight: 500,
+                marginLeft: 8,
+                marginRight: 13,
+                marginBottom: 0,
+              }}>{firestoreUser.name.display}</div>}
+              <div style={{ fontSize: 14, color: "#00000088", marginLeft: 8, marginRight: 13 }}>{user?.email}</div>
             </div>
-            Admin
-          </NavLink> :
-          null
+          </div>
+          <hr />
+          <div className='text-uppercase text-secondary'>
+            {
+              firestoreUser.type === 'admin' ?
+                <NavLink href='/admin-dashboard' className='px-3 py-2 profilePopoverLink'>
+                  <div className='profilePopoverMenu'>
+                    <FontAwesomeIcon style={icon} icon={faShield} />
+                  </div>
+                  Admin
+                </NavLink> :
+                null
+            }
+            <NavLink href='/profile' className='px-3 py-2 profilePopoverLink'>
+              <div className='profilePopoverMenu'>
+                <FontAwesomeIcon style={icon} icon={faBox} />
+              </div>
+              Orders
+            </NavLink>
+            <NavLink href='/profile' className='px-3 py-2 profilePopoverLink'>
+              <div className='profilePopoverMenu'>
+                <FontAwesomeIcon style={icon} icon={faUser} />
+              </div>
+              Profile
+            </NavLink>
+            <NavLink href='/settings' className='px-3 py-2 profilePopoverLink'>
+              <div className='profilePopoverMenu'>
+                <FontAwesomeIcon style={icon} icon={faGear} />
+              </div>
+              Settings
+            </NavLink>
+          </div>
+          <hr style={{ marginBottom: 0 }} />
+          <LogoutButton>
+            <div className="profileLogout">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height={20} width={20} fill='red'><g><path d="M7 6a1 1 0 0 0 0-2H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h2a1 1 0 0 0 0-2H6V6zm13.82 5.42-2.82-4a1 1 0 0 0-1.39-.24 1 1 0 0 0-.24 1.4L18.09 11H10a1 1 0 0 0 0 2h8l-1.8 2.4a1 1 0 0 0 .2 1.4 1 1 0 0 0 .6.2 1 1 0 0 0 .8-.4l3-4a1 1 0 0 0 .02-1.18z"></path></g></svg>
+              Log Out
+            </div>
+          </LogoutButton>
+        </div>
       }
-      <NavLink href='/profile' className='px-3 py-2 profilePopoverLink'>
-        <div className='profilePopoverMenu'>
-          <FontAwesomeIcon style={icon} icon={faBox} />
-        </div>
-        Orders
-      </NavLink>
-      <NavLink href='/profile' className='px-3 py-2 profilePopoverLink'>
-        <div className='profilePopoverMenu'>
-          <FontAwesomeIcon style={icon} icon={faUser} />
-        </div>
-        Profile
-      </NavLink>
-      <NavLink href='/settings' className='px-3 py-2 profilePopoverLink'>
-        <div className='profilePopoverMenu'>
-          <FontAwesomeIcon style={icon} icon={faGear} />
-        </div>
-        Settings
-      </NavLink>
-    </div>
-    <hr style={{ marginBottom: 0 }} />
-    <LogoutButton>
-      <div className="profileLogout">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height={20} width={20} fill='red'><g><path d="M7 6a1 1 0 0 0 0-2H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h2a1 1 0 0 0 0-2H6V6zm13.82 5.42-2.82-4a1 1 0 0 0-1.39-.24 1 1 0 0 0-.24 1.4L18.09 11H10a1 1 0 0 0 0 2h8l-1.8 2.4a1 1 0 0 0 .2 1.4 1 1 0 0 0 .6.2 1 1 0 0 0 .8-.4l3-4a1 1 0 0 0 .02-1.18z"></path></g></svg>
-        Log Out
-      </div>
-    </LogoutButton>
-  </div>
+    </>
+  )
 }
 
 function ProfileButtonTrigger({ user, size }) {
@@ -119,10 +133,10 @@ function ProfileButtonTrigger({ user, size }) {
 export function Navigationbar({ transparent = false, isFixed = true }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  
+
   const toggle = () => setIsOpen(!isOpen);
 
-  const { data: firestoreUser } = useSWR([`${window.location.origin}/api/user/verify`, 'POST'], ([url, method]) => fetchParsed(url, {method: method}), { suspense: true })
+  const { data: firestoreUser } = useSWR([`${window.location.origin}/api/user/verify`, 'POST'], ([url, method]) => fetchParsed(url, { method: method }), { suspense: true })
   const user = getUserCS()
 
   return (

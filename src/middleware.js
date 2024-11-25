@@ -53,8 +53,8 @@ export default async function middleware(req) {
 
         const isAdmin = user?.type == 'admin'
         console.info('User is admin: ' + isAdmin)
-
-        if (user == undefined) {
+        
+        if (user?.type == undefined) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
         }
 

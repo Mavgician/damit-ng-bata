@@ -15,6 +15,11 @@ async function init(req) {
 
     try {
         body = await req.json()
+    } catch {
+        console.warn('Request body is not set.')
+    }
+
+    try {
         currentUser = currentUser ?? await getAuth(app).verifySessionCookie(body?.token)
 
         newUserdata = {
@@ -32,9 +37,8 @@ async function init(req) {
             cart: [],
             type: 'user'
         }
-
-    } catch {
-        console.warn('Request body is not set.')
+    } catch (error) {
+        console.warn('User data cannot be set!')
     }
 
     return ({ currentUser, body, newUserdata })
