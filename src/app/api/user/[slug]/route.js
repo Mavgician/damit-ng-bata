@@ -84,7 +84,14 @@ export async function POST(req, { params }) {
             case 'list':
                 if (userDoc.type === 'admin') {
                     const collectionRef = collection(db, 'users')
-                    const items = await fetchCollectionItems(collectionRef, body.order, body.limit, body.firstDoc, body.lastDoc)
+                    const items = await fetchCollectionItems(
+                        collectionRef,
+                        body.orderBy,
+                        body.order,
+                        body.limit,
+                        body.firstDoc,
+                        body.lastDoc,
+                    )
 
                     return NextResponse.json(items, { status: 200 })
                 } else if (userDoc.type !== 'admin') {
@@ -106,7 +113,8 @@ export async function POST(req, { params }) {
                         description: document.description,
                         price: document.price,
                         imageUrl: document.thmburl.url,
-                        quantity: items[i].quantity
+                        quantity: items[i].quantity,
+                        type: items[i].type
                     })
                 }
 
@@ -118,7 +126,8 @@ export async function POST(req, { params }) {
                         item: doc(db, 'products', body.id),
                         quantity: body.quantity,
                         type: body.type,
-                        id: body.id
+                        id: body.id,
+                        type: body.type
                     })
                 })
                 break

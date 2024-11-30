@@ -9,7 +9,7 @@ import { fetchCollectionItems } from '@/api/fetch_functions'
 const collectionRef = collection(db, 'products')
 
 async function init(req) {
-  let body, newProductData, new_carouselurls = []
+  let body, name, name_insensitive, newProductData, new_carouselurls = []
 
   try {
     body = await req.json()
@@ -18,11 +18,23 @@ async function init(req) {
   }
 
   try {
+
+    try {
+      name = body.name.split(' ')
+      name_insensitive = body.name.toLowerCase().split(' ')
+    } catch {
+      let insensitive = []
+      body.name.forEach(name => insensitive.push(name.toLowerCase()))
+      name = body.name
+      name_insensitive = insensitive
+    }
+
     newProductData = {
       carouselurls: body.carouselurls,
       description: body.description,
       is_available: body.is_available,
-      name: body.name,
+      name: name,
+      name_insensitive: name_insensitive,
       price: body.price,
       tags: body.tags,
       thmburl: body.thumbnail,
@@ -64,7 +76,7 @@ async function init(req) {
 
     newProductData.carouselurls = new_carouselurls
 
-  } catch {
+  } catch (error) {
     console.warn('Request body is not for submission.')
   }
 
@@ -102,15 +114,12 @@ export async function POST(req, { params }) {
       case 'list':
         const items = await fetchCollectionItems(
           collectionRef,
+          body.orderBy,
           body.order,
           body.limit,
           body.firstDoc,
           body.lastDoc,
-          body.category && {
-            field: 'category',
-            operator: '==',
-            searchterm: body.category
-          }
+          body.search
         )
 
         return NextResponse.json(items, { status: 200 })
@@ -119,13 +128,13 @@ export async function POST(req, { params }) {
         const document = doc(collectionRef, body.id)
         const product = (await getDoc(document)).data()
 
-        return NextResponse.json({ ...product }, { status: 200 })
+        return NextResponse.json({ ...product, id: (await getDoc(document)).id }, { status: 200 })
 
       default:
         return NextResponse.json({ error: 'Unknown fetch type' }, { status: 501 })
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return NextResponse.json({ error: 'Wrong request', message: error }, { status: 500 })
   }
 

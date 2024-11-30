@@ -57,7 +57,7 @@ export function SetProduct({ context }) {
   }
 
   useEffect(() => {
-    setName(data?.name ?? '')
+    setName(data?.name.join(' ') ?? '')
     setDescription(data?.description ?? '')
     setIsAvailable(data?.is_available ?? false)
     setTags(data?.tags ?? [])

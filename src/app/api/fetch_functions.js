@@ -12,19 +12,19 @@ import {
   where
 } from 'firebase/firestore';
 
-export async function fetchCollectionItems(collection, order, searchLimit = 10, firstDoc, lastDoc, filter) {
+export async function fetchCollectionItems(collection, orderByKey, order = 'asc', searchLimit = 10, firstDoc, lastDoc, filter) {
   let data = []
   let queryRef
 
-  let initQuery
+  let initQuery, search = []
 
-  if (filter) {
-    initQuery = query(collection, orderBy(order), where(filter.field, filter.operator, filter.searchterm))
+  filter?.forEach(f => search.push(where(f.field, f.operator, f.searchterm)))
+
+  if (search.length > 0) {
+    initQuery = query(collection, orderBy(orderByKey, order), ...search)
   } else {
-    initQuery = query(collection, orderBy(order))
+    initQuery = query(collection, orderBy(orderByKey, order))
   }
-  
-  const totalCount = await getCountFromServer(collection)
 
   if (firstDoc) {
       const cursor = await getDoc(doc(collection, firstDoc))
@@ -36,13 +36,14 @@ export async function fetchCollectionItems(collection, order, searchLimit = 10, 
       queryRef = query(initQuery, limit(searchLimit))
   }
 
+  const queryCount = await getCountFromServer(initQuery)
   const snapshot = await getDocs(queryRef)
 
   for (let i = 0; i < snapshot.docs.length; i++) {
       data.push({...snapshot.docs[i].data(), id: snapshot.docs[i].id})
   }
 
-  const payload = { data, count: totalCount.data().count }
+  const payload = { data, count: queryCount.data().count }
 
   return payload
 }
