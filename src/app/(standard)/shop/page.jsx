@@ -23,7 +23,6 @@ import { useDebouncedCallback } from 'use-debounce';
 
 import Skeleton from 'react-loading-skeleton';
 
-
 export default function Page() {
   const [productName, setProductName] = useState('');
   const [ghostName, setGhostName] = useState('');
@@ -198,8 +197,8 @@ export default function Page() {
             <Row>
               {
                 isLoading || loader ?
-                  [...Array(8)].map(() =>
-                    <Col md={3}>
+                  [...Array(8)].map((idx) =>
+                    <Col key={`skeletonloader-${idx}`} md={3}>
                       <div className='mb-2'>
                         <Skeleton height={300} />
                       </div>
