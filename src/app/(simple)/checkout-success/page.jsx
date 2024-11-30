@@ -14,7 +14,12 @@ export default function Page() {
   const router = useRouter()
 
   useEffect(() => {
-    
+    fetch(
+      `${window.location.origin}/api/create-order`, 
+      {
+        method: 'POST',
+      }
+    )
   }, []);
 
   useEffect(() => {

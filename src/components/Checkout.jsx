@@ -9,7 +9,7 @@ import {
   PaymentElement
 } from '@stripe/react-stripe-js'
 
-import { Button, Form, Row, Col } from "reactstrap"
+import { Button, Form, Row, Col, Spinner } from "reactstrap"
 import { convertToPhCurrency } from "@/lib/convertToPHCurrency"
 
 import { ConfirmationModal } from './modal_template'
@@ -113,7 +113,7 @@ export function CheckoutPage({ amount }) {
         </ConfirmationModal>
       </PayContext.Provider>
       <Form onSubmit={submitHandler}>
-        {clientSecret && <PaymentElement />}
+        {clientSecret && <PaymentElement onChange={e => console.log(e)}/>}
         <Row>
           <Col className="pe-1" md={2}>
             <Button onClick={() => setIsExit(true)} className="my-4 w-100 py-3" size="lg" color="danger">
@@ -122,7 +122,7 @@ export function CheckoutPage({ amount }) {
           </Col>
           <Col className="ps-1" md={10}>
             <Button onClick={submitHandler} disabled={!stripe || loading} className="my-4 w-100 py-3" size="lg" color="dark">
-              <b>{!loading ? `Pay ${convertToPhCurrency(amount)}` : 'Processing...'}</b>
+              {!loading ? <b>Pay {convertToPhCurrency(amount)}</b> : <Spinner size={'sm'}/>}
             </Button>
           </Col>
         </Row>

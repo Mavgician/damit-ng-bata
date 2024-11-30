@@ -13,7 +13,7 @@ import {
   Spinner
 } from 'reactstrap'
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserCS } from 'firebase-nextjs/client/auth';
 

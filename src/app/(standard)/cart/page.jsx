@@ -110,7 +110,7 @@ export default function CartPage() {
                           <p className="text-muted">{item.description}</p>
                           <div className="d-flex gap-3 mb-3">
                             {
-                              item.type.map(type => <p className="m-0"><b>{type.key}:</b> {type.value}</p>)
+                              item.type.map(type => <p key={`${type.key}-${type.value}`} className="m-0"><b>{type.key}:</b> {type.value}</p>)
                             }
                           </div>
                           <div className="d-flex align-items-center justify-content-end">

@@ -128,12 +128,12 @@ function ProfilePopup({ user, firestoreUser }) {
   )
 }
 
-function ProfileButtonTrigger({ user, size }) {
+/* function ProfileButtonTrigger({ user, size }) {
   const imageUrl = user?.photoURL ?? "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=" + (user?.displayName ?? user?.email);
   return (
     <img src={imageUrl} alt="profile" height={size} width={size} className="rounded-circle" style={{ cursor: "pointer" }} />
   );
-};
+}; */
 
 export function Navigationbar({ transparent = false, isFixed = true }) {
   const [isOpen, setIsOpen] = useState(false);

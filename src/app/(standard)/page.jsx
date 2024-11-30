@@ -19,13 +19,13 @@ export default function Home() {
         <Container className='mb-5'>
           <Row>
             <Col md={6}>
-              <h1 className='fw-normal mb-3'>Your first stop to fabulous childrens' fashion.</h1>
+              <h1 className='fw-normal mb-3'>Your first stop to fabulous childrens&apos; fashion.</h1>
               <Link href='/'><Button color='light rounded-pill'>Explore Now</Button></Link>
             </Col>
             <Col md={6} className='position-relative'>
               <div className='position-absolute bottom-0 end-0 w-75'>
                 <p className='m-0'>
-                  <i>Explore our curated selection of childrens' clothing. Where simplicity meets elegance, giving your children comfort and style.</i>
+                  <i>Explore our curated selection of childrens&apos; clothing. Where simplicity meets elegance, giving your children comfort and style.</i>
                 </p>
               </div>
             </Col>
