@@ -1,107 +1,121 @@
 'use client';
 
-import { Container, Row, Col, Spinner } from 'reactstrap'
+import {
+  Container,
+  Row,
+  Col,
+  Label,
+  Input
+} from 'reactstrap'
 import { fetchParsed } from '@/src/lib/DataServer'
+import { useState } from 'react';
 
 import Link from 'next/link'
 import useSWR from 'swr'
 
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css'
+
 export default function Page({ params }) {
-  const { data: product, isLoading } = useSWR(['api/product/list'],
-    ([url]) => fetchParsed(url, {
+  const [orderBy, setOrderBy] = useState({ key: 'creation', order: 'asc' });
+
+  const { data: product, isLoading } = useSWR(['api/product/list', orderBy],
+    ([url, order]) => fetchParsed(url, {
       method: 'POST',
       body: JSON.stringify({
-        order: 'creation',
-        limit: 10,
-        category: params.category
+        orderBy: order.key,
+        order: order.order,
+        limit: 20,
+        search: [
+          {
+            field: 'category',
+            operator: '==',
+            searchterm: params.category
+          }
+        ]
       })
     }))
 
-  if (isLoading) {
-    return <div className='vh-100 d-flex justify-content-center align-items-center'><Spinner size='lg'></Spinner></div>
-  }
-
-  if (product?.data.length === 0) {
-    return <div className='vh-100 d-flex justify-content-center align-items-center'><h1>No product/s to show for {params.category}</h1></div>
-  }
-
   return (
     <main>
-      <section className="banner">
-        <div className="banner-content">
-          <h1 className="banner-title">{params.category.toUpperCase()}</h1>
-        </div>
-      </section>
-
-      <section className="featured-products">
+      <section className="product-grid">
         <Container>
-          <div className="featured-products-banner d-flex justify-content-center">
-            <h2>Featured Products</h2>
+          <div className='text-secondary d-flex gap-2'>
+            <Link className='text-reset text-decoration-none' href={'/'}>Homepage</Link>
+            &gt;
+            <Link className='text-reset text-decoration-none' href={`/${params.category}`}>{params.category}</Link>
           </div>
-          <Row>
-            <Col md={4}>
-              <div className="featured-product">
-                <Link href="/products">
-                  <img src="https://www.myperiwinkle.com/cdn/shop/files/ginee_20240927172409270_1110767406.png?v=1727429114&width=480" alt="Product 1" />
-                </Link>
-                <h3>Product 1</h3>
-                <p>Description of Product 1</p>
-              </div>
+          <h1 className='my-3' style={{ fontSize: '3em' }}>{params.category.toUpperCase()}</h1>
+          <Row className="mt-4 pb-3">
+            <Col className='d-flex align-items-end'>
+              <p className='m-0 flex-grow-1'>{product?.count ?? 0} products</p>
             </Col>
-            <Col md={4}>
-              <div className="featured-product">
-                <Link href="/products">
-                  <img src="https://www.myperiwinkle.com/cdn/shop/files/ginee_20240927172409270_1110767406.png?v=1727429114&width=480" alt="Product 2" />
-                </Link>
-                <h3>Product 2</h3>
-                <p>Description of Product 2</p>
-              </div>
-            </Col>
-            <Col md={4}>
-              <div className="featured-product">
-                <Link href="/products">
-                  <img src="https://www.myperiwinkle.com/cdn/shop/files/ginee_20240927172409270_1110767406.png?v=1727429114&width=480" alt="Product 3" />
-                </Link>
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-              </div>
+            <Col className='d-flex justify-content-end'>
+              <Row className='w-50'>
+                <Label md={4} className='d-flex justify-content-end'><h5 className='m-0'>Sort by</h5></Label>
+                <Col md={8}>
+                  <Input
+                    type='select'
+                    onChange={e => setOrderBy(JSON.parse(e.target.value))}
+                  >
+                    <option value={JSON.stringify({ key: 'creation', order: 'asc' })}>Newest</option>
+                    <option value={JSON.stringify({ key: 'creation', order: 'desc' })}>Oldest</option>
+                    <option value={JSON.stringify({ key: 'price', order: 'asc' })}>Price: Low to High</option>
+                    <option value={JSON.stringify({ key: 'price', order: 'desc' })}>Price: High to Low</option>
+                  </Input>
+                </Col>
+              </Row>
             </Col>
           </Row>
-        </Container>
-      </section>
 
-      <section className="banner">
-        <div className="banner-content">
-          <h1 className="banner-title">PROMOTIONAL PRODUCTS</h1>
-        </div>
-      </section>
-
-      {
-        isLoading ?
-          <Spinner />
-          :
-          <section className="product-grid">
-            <Container>
-              <Row>
-                {
-                  product.data.length > 0 && product.data.map((product, idx) => (
-                    <Col xs={6} md={4} lg={3} key={idx}>
-                      <Link className='text-reset text-decoration-none' href={`/products/${product.id}`}>
+          <Row>
+            {
+              isLoading ?
+                <>
+                  {[...Array(8)].map(() =>
+                    <Col md={3}>
+                      <div className='mb-2'>
+                        <Skeleton height={300} />
+                      </div>
+                      <h5>
+                        <Skeleton count={3} />
+                      </h5>
+                    </Col>
+                  )}
+                </>
+                :
+                product.data.length > 0 ?
+                  product.data.map((product, idx) => (
+                    <Col md={3} key={idx} className='mb-4'>
+                      <Link
+                        className='text-reset text-decoration-none'
+                        href={{
+                          pathname: `/products/${product.id}`,
+                          query: { category: params.category }
+                        }}
+                      >
                         <div className="product-item">
                           <div className='d-flex align-items-center justify-content-center product-image'>
                             <img src={product.thmburl.url} alt={product.thmburl.id} />
                           </div>
-                          <h3>{product.name}</h3>
+                          <h5 className='text-truncate'>{product.name.join(' ')}</h5>
+                          <div className="d-flex">
+                            <h5>{Intl.NumberFormat('en-CA', { style: 'currency', currency: 'PHP' }).format(product.price)}</h5>
+                            <div className='flex-grow-1 d-flex justify-content-end'>
+                              stars
+                            </div>
+                          </div>
                           <p>{product.description}</p>
                         </div>
                       </Link>
                     </Col>
                   ))
-                }
-              </Row>
-            </Container>
-          </section>
-      }
+                  :
+                  <div><h1>No product/s to show for {params.category}</h1></div>
+            }
+          </Row>
+        </Container>
+      </section>
     </main>
-  );
+  )
 }
