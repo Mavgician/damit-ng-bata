@@ -7,7 +7,7 @@ import {
   Label,
   Input
 } from 'reactstrap'
-import { fetchParsed } from '@/src/lib/DataServer'
+import { fetchParsed } from '@/lib/fetch-parsed'
 import { useState } from 'react';
 
 import Link from 'next/link'

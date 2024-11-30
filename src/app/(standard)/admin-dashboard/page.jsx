@@ -21,7 +21,7 @@ import { useContext, useEffect, useState } from 'react';
 
 import { Timestamp } from 'firebase/firestore';
 import { createContext } from 'react';
-import { fetchParsed } from '@/src/lib/DataServer';
+import { fetchParsed } from '@/lib/fetch-parsed'
 
 import { SetProduct, SetUser } from './modals'
 

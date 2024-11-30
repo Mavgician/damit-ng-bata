@@ -11,7 +11,7 @@ import {
   Input,
   Button
 } from 'reactstrap'
-import { fetchParsed } from '@/src/lib/DataServer'
+import { fetchParsed } from '@/lib/fetch-parsed'
 
 import Link from 'next/link'
 import useSWR from 'swr'

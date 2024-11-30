@@ -24,7 +24,7 @@ import { Popover } from 'react-tiny-popover';
 
 import { getUserCS } from 'firebase-nextjs/client/auth';
 import { LogoutButton } from 'firebase-nextjs/client/components';
-import { fetchParsed } from '@/lib/DataServer';
+import { fetchParsed } from '@/lib/fetch-parsed'
 
 import useSWR from 'swr';
 import { useRouter } from 'next/navigation';

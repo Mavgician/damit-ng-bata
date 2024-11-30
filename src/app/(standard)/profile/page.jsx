@@ -11,8 +11,7 @@ import {
 
 import { useState, useEffect } from 'react';
 
-/* import { getUserCS } from 'firebase-nextjs/client/auth'; */
-import { fetchParsed } from '@/src/lib/DataServer';
+import { fetchParsed } from '@/lib/fetch-parsed'
 
 import useSWR from 'swr';
 import Image from 'next/image';

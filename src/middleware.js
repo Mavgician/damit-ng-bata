@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers'
 
-import { fetchParsed } from '@/lib/DataServer'
+import { fetchParsed } from '@/lib/fetch-parsed'
 
 import checkUser from 'firebase-nextjs/middleware/check-user'
 

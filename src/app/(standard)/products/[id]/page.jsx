@@ -11,8 +11,8 @@ import {
   CarouselControl
 } from 'reactstrap';
 
-import { fetchParsed } from '@/src/lib/DataServer';
-import { useState, useEffect } from 'react';
+import { fetchParsed } from '@/lib/fetch-parsed'
+import { useState } from 'react';
 
 import useSWR from 'swr';
 
