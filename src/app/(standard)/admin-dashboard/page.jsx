@@ -67,7 +67,7 @@ export default function Page() {
 
 function AdminModule({ children, url }) {
   const [limit, setLimit] = useState(20);
-  const [orderBy, setOrderBy] = useState('creation');
+  const [orderBy, setOrderBy] = useState({ key: 'creation', order: 'asc' });
 
   const [firstDoc, setFirstDoc] = useState();
   const [lastDoc, setLastDoc] = useState();
@@ -91,7 +91,8 @@ function AdminModule({ children, url }) {
     ([url, order, limit, firstDoc, lastDoc]) => fetchParsed(url, {
       method: 'POST',
       body: JSON.stringify({
-        order: order,
+        orderBy: order.key,
+        order: order.order,
         limit: limit,
         firstDoc: firstDoc,
         lastDoc: lastDoc,
@@ -112,6 +113,8 @@ function AdminModule({ children, url }) {
     setCancelFunc,
     setSubmitData,
     setSubmitType,
+    limit,
+    orderBy,
     modalData,
     isOpen,
     pageNumber,
@@ -161,8 +164,8 @@ function AdminModule({ children, url }) {
   return <AdminTableData.Provider value={providerValue}>{children}</AdminTableData.Provider>
 }
 
-function TableControls({ setLimit, setOrderBy, next, prev }) {
-  const { data, pageNumber, maxPage, setIsOpen, isOpen, setModalData, setSubmitType } = useContext(AdminTableData)
+function TableControls({ setLimit, setOrderBy, next, prev, children }) {
+  const { data, pageNumber, maxPage, setIsOpen, isOpen, setModalData, setSubmitType, limit, orderBy } = useContext(AdminTableData)
 
   function addItem() {
     setModalData(null)
@@ -170,42 +173,74 @@ function TableControls({ setLimit, setOrderBy, next, prev }) {
     setSubmitType('add')
   }
 
+  const [sort, setSort] = useState(orderBy.key);
+  const [order, setOrder] = useState(orderBy.order);
+
+  function handleOrderBy(data) {
+    if (data?.sort) {
+      setOrderBy({ key: data.sort, order: order })
+      setSort(data.sort)
+    }
+
+    if (data?.order) {
+      setOrderBy({ key: sort, order: data.order })
+      setOrder(data.order)
+    }
+  }
+
   return (
     <>
-      <Button className='ms-3' onClick={addItem}> Add + </Button>
-      <div className='d-flex flex-grow-1 justify-content-end align-items-center'>
-        <div className='d-flex align-items-center gap-2 me-3'>
-          <p className="m-0">Show</p>
-          <div>
-            <Input
-              type='select'
-              onChange={(e) => { setLimit(Number(e.target.value)) }}
-            >
-              <option value={20}>20</option>
-              <option value={15}>15</option>
-              <option value={10}>10</option>
-              <option value={5}>5</option>
-            </Input>
+      <div className="d-flex align-items-center bg-dark text-light p-3">
+        <h4 className='m-0'>{children}</h4>
+        <Button className='ms-3' onClick={addItem}> Add + </Button>
+        <div className='d-flex flex-grow-1 justify-content-end align-items-center'>
+          <div className='d-flex align-items-center gap-2 me-3'>
+            <p className="m-0">Show</p>
+            <div>
+              <Input
+                type='select'
+                onChange={(e) => { setLimit(Number(e.target.value)) }}
+                value={limit}
+              >
+                <option value={20}>20</option>
+                <option value={15}>15</option>
+                <option value={10}>10</option>
+                <option value={5}>5</option>
+              </Input>
+            </div>
           </div>
-        </div>
-        <div className='d-flex align-items-center gap-2 me-3'>
-          <p className="m-0">Sort by</p>
-          <div>
-            <Input
-              type='select'
-              onChange={(e) => { setOrderBy(e.target.value) }}
-            >
-              <option value={'creation'}>Creation</option>
-              <option value={'name'}>Name</option>
-              <option value={'id'}>ID</option>
-              <option value={'email'}>Email</option>
-              <option value={'type'}>Type</option>
-            </Input>
+          <div className='d-flex align-items-center gap-2 me-3'>
+            <p className="m-0">Sort by</p>
+            <div>
+              <Input
+                type='select'
+                onChange={(e) => { handleOrderBy({ sort: e.target.value }) }}
+                value={sort}
+              >
+                <option value={'id'}>ID</option>
+                <option value={'creation'}>Creation</option>
+                <option value={'last_modified'}>Last Modified</option>
+                <option value={'name'}>Name</option>
+              </Input>
+            </div>
           </div>
+          <div className='d-flex align-items-center gap-2 me-3'>
+            <p className="m-0">Order by</p>
+            <div>
+              <Input
+                type='select'
+                onChange={(e) => { handleOrderBy({ order: e.target.value }) }}
+                value={order}
+              >
+                <option value={'asc'}>Ascending</option>
+                <option value={'desc'}>Descending</option>
+              </Input>
+            </div>
+          </div>
+          <p className='m-0' style={{ fontSize: '0.8em' }}>Page {pageNumber + 1} of {maxPage}</p>
+          <Button color='dark' className={'ms-1'} onClick={() => prev(data)}>&lt;</Button>
+          <Button color='dark' className={'ms-1'} onClick={() => next(data)}>&gt;</Button>
         </div>
-        <p className='m-0' style={{ fontSize: '0.8em' }}>Page {pageNumber + 1} of {maxPage}</p>
-        <Button color='light' className={'ms-1'} onClick={() => prev(data)}>&lt;</Button>
-        <Button color='light' className={'ms-1'} onClick={() => next(data)}>&gt;</Button>
       </div>
     </>
   )
@@ -223,11 +258,10 @@ function Accounts() {
 
   return (
     <>
-      <SetUser context={AdminTableData}/>
-      <div className="d-flex align-items-center mb-3">
-        <h4 className='m-0'>Manage User Accounts</h4>
-        <TableControls setLimit={setLimit} setOrderBy={setOrderBy} next={next} prev={prev} />
-      </div>
+      <SetUser context={AdminTableData} />
+      <TableControls setLimit={setLimit} setOrderBy={setOrderBy} next={next} prev={prev}>
+        Manage User Accounts
+      </TableControls>
       <Table hover responsive className='p-3'>
         <thead>
           <tr>
@@ -363,10 +397,9 @@ function Products() {
           You will be deleting this product with id of <b>{id}</b>.
         </ConfirmationModal>
       </ConfirmModalContext.Provider>
-      <div className="d-flex align-items-center mb-3">
-        <h4 className='m-0'>Manage Products</h4>
-        <TableControls setLimit={setLimit} setOrderBy={setOrderBy} next={next} prev={prev} />
-      </div>
+      <TableControls setLimit={setLimit} setOrderBy={setOrderBy} next={next} prev={prev}>
+        Manage Products
+      </TableControls>
       <Table hover responsive className='p-3'>
         <thead>
           <tr>
@@ -388,7 +421,7 @@ function Products() {
                   <span>{data.id}</span>
                 </td>
                 <td className='text-muted'>
-                  <span>{data.name}</span>
+                  <span>{data.name.join(' ')}</span>
                 </td>
                 <td className='text-muted'>
                   <span>
