@@ -11,13 +11,13 @@
 }
 
 main {
-  min-height: calc(100vh - 70px);
+  min-height: calc(100vh - 56px);
 }
 
 /*Home page image*/
 
 .image-container {
-  height: 100vh;
+  height: 50vh;
   width: 100vw;
   overflow: hidden;
 }
@@ -26,6 +26,7 @@ main {
   height: 100%;
   width: 100%;
   object-fit: cover;
+  object-position: 0px 30%;
 }
 
 /* Product pages */
@@ -80,11 +81,6 @@ main {
   padding: 2rem 0;
 }
 
-.product-item {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
 .product-item img {
   max-width: 100%;
   transition: transform 0.3s ease;
@@ -100,6 +96,10 @@ main {
   aspect-ratio: 1/1;
   width: 100%;
   margin-bottom: 1em;
+}
+
+.product-carousel-control span {
+  filter: brightness(0);
 }
 
 .banner-title {
@@ -165,4 +165,10 @@ main {
 
 .product-image-admin:hover {
   filter: brightness(0.8);
+}
+
+/* Miscellaneous */
+
+.cursor-not-allowed {
+  cursor: not-allowed !important
 }
