@@ -23,7 +23,6 @@ export function CheckoutPage({ amount }) {
   const stripe = useStripe()
   const elements = useElements()
 
-  const [errorMessage, setErrorMessage] = useState('')
   const [clientSecret, setClientSecret] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -40,7 +39,7 @@ export function CheckoutPage({ amount }) {
     const { error: submitError } = await elements.submit()
 
     if (submitError) {
-      setErrorMessage(submitError.message)
+      console.warn(submitError.message)
       setLoading(false)
       return
     }
@@ -54,7 +53,7 @@ export function CheckoutPage({ amount }) {
     })
 
     if (error) {
-      setErrorMessage(error.message)
+      console.warn(error.message)
     }
 
     setLoading(false)
@@ -115,7 +114,6 @@ export function CheckoutPage({ amount }) {
       </PayContext.Provider>
       <Form onSubmit={submitHandler}>
         {clientSecret && <PaymentElement />}
-        {errorMessage && <div>{errorMessage}</div>}
         <Row>
           <Col className="pe-1" md={2}>
             <Button onClick={() => setIsExit(true)} className="my-4 w-100 py-3" size="lg" color="danger">
