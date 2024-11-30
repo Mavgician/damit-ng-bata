@@ -17,6 +17,8 @@ import useSWR from "swr";
 
 import Link from "next/link";
 
+import { convertToPhCurrency } from '@/lib/convertToPHCurrency';
+
 export default function CartPage() {
   const { data: cartItems, isLoading } = useSWR(
     [`${window.location.origin}/api/user/cart`],
@@ -103,7 +105,7 @@ export default function CartPage() {
                         <div>
                           <div className="d-flex">
                             <h6>{item.name.join(' ')}</h6>
-                            <h6 className='ms-auto m-0 text-primary'>{Intl.NumberFormat('en-CA', { style: 'currency', currency: 'PHP' }).format(item.price * item.quantity)}</h6>
+                            <h6 className='ms-auto m-0 text-primary'>{convertToPhCurrency(item.price * item.quantity)}</h6>
                           </div>
                           <p className="text-muted">{item.description}</p>
                           <div className="d-flex gap-3 mb-3">
@@ -151,27 +153,27 @@ export default function CartPage() {
                 </div>
                 <div className="d-flex justify-content-between">
                   <span>Subtotal:</span>
-                  <span>{Intl.NumberFormat('en-CA', { style: 'currency', currency: 'PHP' }).format(calculateTotal())}</span>
+                  <span>{convertToPhCurrency(calculateTotal())}</span>
                 </div>
                 <div className="d-flex justify-content-between">
                   <span>Estimated Shipping & Handling:</span>
-                  <span>{Intl.NumberFormat('en-CA', { style: 'currency', currency: 'PHP' }).format(50)}</span>
+                  <span>{convertToPhCurrency(50)}</span>
                 </div>
                 <hr />
                 <div className="d-flex justify-content-between">
                   <strong>Total:</strong>
-                  <strong>{Intl.NumberFormat('en-CA', { style: 'currency', currency: 'PHP' }).format(calculateTotal() + 50)}</strong>
+                  <strong>{convertToPhCurrency(calculateTotal() + 50)}</strong>
                 </div>
-                <Button color="primary" block className="my-3">
-                  Checkout
-                </Button>
-                <Button color="light" block style={{ display: 'flex', alignItems: 'center' }}>
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/800px-PayPal.svg.png?20230314142951"
-                    alt="PayPal"
-                    style={{ width: '150px', height: '40px', marginRight: '8px' }}
-                  />
-                </Button>
+                <Link href={{
+                  pathname: '/checkout',
+                  query: {
+                    amount: calculateTotal() + 50
+                  }
+                }}>
+                  <Button color="primary" block className="my-3">
+                    Checkout
+                  </Button>
+                </Link>
               </CardBody>
             </Card>
           </Col>

@@ -13,6 +13,7 @@ import {
 
 import { fetchParsed } from '@/lib/fetch-parsed'
 import { useState } from 'react';
+import { convertToPhCurrency } from '@/src/lib/convertToPHCurrency';
 
 import useSWR from 'swr';
 
@@ -20,6 +21,7 @@ import InnerImageZoom from 'react-inner-image-zoom';
 import '@/lib/react-innner-image-zoom.min.css'
 
 import Link from 'next/link';
+
 
 function ProductGallery({ images }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -143,10 +145,6 @@ export default function Page({ params }) {
     )
   }
 
-  function buybtn() {
-
-  }
-
   function typeHandler(t) {
     t = t.split('-')
 
@@ -204,7 +202,7 @@ export default function Page({ params }) {
               <div className='d-flex justify-content-end'>
                 Rating (0) [stars]
               </div>
-              <h2 className='text-primary'>{Intl.NumberFormat('en-CA', { style: 'currency', currency: 'PHP' }).format(product.price)}</h2>
+              <h2 className='text-primary'>{convertToPhCurrency(product.price)}</h2>
               <p className='mb-2 mt-4'><b>Item Description</b></p>
               <p>{product.description}</p>
               {
@@ -229,7 +227,14 @@ export default function Page({ params }) {
               }
               <div className='d-flex align-items-center justify-content-end gap-1'>
                 <Button disabled={isDisabled} color="success" onClick={addcartbtn}>Add to Cart</Button>
-                <Button disabled={isDisabled} color="primary" onClick={buybtn}>Buy Now</Button>
+                <Link href={{
+                  pathname: '/checkout',
+                  query: {
+                    amount: product.price,
+                    from: params.id,
+                    category: product.category
+                  }
+                }}><Button disabled={isDisabled} color="primary">Buy Now</Button></Link>
               </div>
             </Col>
           </Row>

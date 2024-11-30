@@ -169,12 +169,12 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
                   </DropdownToggle>
                   <DropdownMenu>
                     <DropdownItem>
-                      <NavLink href={'/boys'}>
+                      <NavLink href={'/category/boys'}>
                         Boys
                       </NavLink>
                     </DropdownItem>
                     <DropdownItem>
-                      <NavLink href={'/girls'}>
+                      <NavLink href={'/category/girls'}>
                         Girls
                       </NavLink>
                     </DropdownItem>

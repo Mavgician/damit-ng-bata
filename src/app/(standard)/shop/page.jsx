@@ -1,25 +1,28 @@
 'use client';
 
+import { convertToPhCurrency } from '@/lib/convertToPHCurrency'
+
 import {
   Container,
   Row,
   Col,
-  Spinner,
   Form,
   FormGroup,
   Label,
   Input,
   Button
 } from 'reactstrap'
+
 import { fetchParsed } from '@/lib/fetch-parsed'
 
 import Link from 'next/link'
 import useSWR from 'swr'
+
 import { useState, useEffect } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css'
+
 
 export default function Page() {
   const [productName, setProductName] = useState('');
@@ -220,7 +223,7 @@ export default function Page() {
                           </div>
                           <h5 className='text-truncate'>{product.name.join(' ')}</h5>
                           <div className="d-flex">
-                            <h5>{Intl.NumberFormat('en-CA', { style: 'currency', currency: 'PHP' }).format(product.price)}</h5>
+                            <h5>{convertToPhCurrency(product.price)}</h5>
                             <div className='flex-grow-1 d-flex justify-content-end'>
                               stars
                             </div>

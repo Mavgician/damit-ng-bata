@@ -14,12 +14,11 @@ import Link from 'next/link'
 import useSWR from 'swr'
 
 import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css'
 
 export default function Page({ params }) {
   const [orderBy, setOrderBy] = useState({ key: 'creation', order: 'asc' });
 
-  const { data: product, isLoading } = useSWR(['api/product/list', orderBy],
+  const { data: product, isLoading } = useSWR([`${window.location.origin}/api/product/list`, orderBy],
     ([url, order]) => fetchParsed(url, {
       method: 'POST',
       body: JSON.stringify({
