@@ -1,7 +1,7 @@
 'use client';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faGear, faBox, faShield } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faGear, faBox, faShield, faCartShopping, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 
 import { useState, useEffect } from 'react';
 import {
@@ -13,6 +13,11 @@ import {
   NavItem,
   NavLink,
   Button,
+  Container,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  UncontrolledDropdown
 } from 'reactstrap';
 
 import { Popover } from 'react-tiny-popover';
@@ -147,25 +152,45 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
         fixed={isFixed ? 'top' : undefined}
         style={transparent ? { boxShadow: 'none' } : undefined}
       >
-        <NavbarBrand href='/' className='d-flex align-items-center'>
-          <small className='mx-2'>
-            <b>DNB</b>
-          </small>
-        </NavbarBrand>
-        <NavbarToggler onClick={toggle} />
-        <Collapse isOpen={isOpen} navbar>
+        <Container className="position-relative d-flex w-100 h-100">
+          <NavbarBrand href='/' style={{ transform: 'translate(-50%, -50%)' }} className='d-flex align-items-center position-absolute start-50 top-50'>
+            <h3 className='m-0'><b>DNB</b></h3>
+          </NavbarBrand>
+          <NavbarToggler onClick={toggle} />
+          <Collapse isOpen={isOpen} navbar>
+            <Nav className='fw-bold d-flex align-items-center' navbar>
+              <NavItem>
+                <NavLink href='/shop'>Shop</NavLink>
+              </NavItem>
+              <NavItem>
+                <UncontrolledDropdown setActiveFromChild>
+                  <DropdownToggle caret className="nav-link" tag="a" role='button'>
+                    Categories
+                  </DropdownToggle>
+                  <DropdownMenu>
+                    <DropdownItem>
+                      <NavLink href={'/boys'}>
+                        Boys
+                      </NavLink>
+                    </DropdownItem>
+                    <DropdownItem>
+                      <NavLink href={'/girls'}>
+                        Girls
+                      </NavLink>
+                    </DropdownItem>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              </NavItem>
+              <NavItem>
+                <NavLink href='/about-us'>About Us</NavLink>
+              </NavItem>
+            </Nav>
+          </Collapse>
           <Nav className='ms-auto fw-bold d-flex align-items-center' navbar>
             <NavItem>
-              <NavLink href='/boys'>Boys</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href='/girls'>Girls</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href='/cart'>Cart</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href='/about-us'>About Us</NavLink>
+              <NavLink href='/cart'>
+                <FontAwesomeIcon icon={faCartShopping}></FontAwesomeIcon>
+              </NavLink>
             </NavItem>
             <NavItem>
               {
@@ -177,7 +202,7 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
                   >
                     <div>
                       <Button onClick={() => setIsPopoverOpen(!isPopoverOpen)} color='transparent'>
-                        <ProfileButtonTrigger user={user.currentUser} size={40} />
+                        <FontAwesomeIcon icon={faUserAlt}></FontAwesomeIcon>
                       </Button>
                     </div>
                   </Popover>
@@ -190,9 +215,9 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
               }
             </NavItem>
           </Nav>
-        </Collapse>
+        </Container>
       </Navbar>
-      {isFixed ? <div style={{ height: 70 }}>&nbsp;</div> : null}
+      {isFixed ? <div style={{ height: 56 }}>&nbsp;</div> : null}
     </>
   );
 }
