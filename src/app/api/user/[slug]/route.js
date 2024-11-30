@@ -37,8 +37,8 @@ async function init(req) {
             cart: [],
             type: 'user'
         }
-    } catch (error) {
-        console.warn('User data cannot be set!')
+    } catch {
+        console.warn('User data cannot be set.')
     }
 
     return ({ currentUser, body, newUserdata })

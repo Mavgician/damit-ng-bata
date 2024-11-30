@@ -22,6 +22,8 @@ export async function POST(req) {
       stripe_id: data.stripe_id
     }
 
+    console.log(payload)
+
   } catch (error) {
     console.warn(error)
   }

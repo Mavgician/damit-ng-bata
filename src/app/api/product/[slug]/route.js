@@ -76,7 +76,7 @@ async function init(req) {
 
     newProductData.carouselurls = new_carouselurls
 
-  } catch (error) {
+  } catch {
     console.warn('Request body is not for submission.')
   }
 
