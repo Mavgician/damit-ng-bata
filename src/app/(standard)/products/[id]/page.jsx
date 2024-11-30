@@ -12,12 +12,14 @@ import {
 } from 'reactstrap';
 
 import { fetchParsed } from '@/src/lib/DataServer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import useSWR from 'swr';
 
 import InnerImageZoom from 'react-inner-image-zoom';
 import '@/lib/react-innner-image-zoom.min.css'
+
+import Link from 'next/link';
 
 function ProductGallery({ images }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -68,14 +70,49 @@ function ProductGallery({ images }) {
         direction="prev"
         directionText="Previous"
         onClickHandler={previous}
+        className='product-carousel-control'
       />
       <CarouselControl
         direction="next"
         directionText="Next"
         onClickHandler={next}
+        className='product-carousel-control'
       />
     </Carousel>
   )
+}
+
+function TypeButton({ data, keyname, onClick }) {
+  const [active, setActive] = useState();
+
+  let btns = []
+
+  function btnHandler(type, idx) {
+    if (active === idx) {
+      onClick(`${keyname}-${type}-remove`)
+      setActive(undefined)
+    } else {
+      onClick(`${keyname}-${type}`)
+      setActive(idx)
+    }
+  }
+
+  data.forEach((type, idx) => {
+    const typename = Object.keys(type)[0]
+
+    btns.push(
+      <Button
+        active={active === idx}
+        key={`${keyname}-${idx}`}
+        color="secondary"
+        outline
+        onClick={() => btnHandler(typename, idx)}>
+        {typename}
+      </Button>
+    )
+  })
+
+  return btns
 }
 
 export default function Page({ params }) {
@@ -89,7 +126,8 @@ export default function Page({ params }) {
     }
     ))
 
-  const [type, setType] = useState(0);
+  const [type, setType] = useState([]);
+  const [isDisabled, setIsDisabled] = useState(true);
 
   function addcartbtn() {
     fetch(
@@ -109,6 +147,32 @@ export default function Page({ params }) {
 
   }
 
+  function typeHandler(t) {
+    t = t.split('-')
+
+    const payload = {
+      key: t[0],
+      value: t[1],
+    }
+
+    let types = [...type.filter(data => data.key != payload.key)]
+    let newTypes = []
+
+    if (t[2] == 'remove') {
+      newTypes = types
+    } else {
+      newTypes = [payload, ...types]
+    }
+
+    if (newTypes.length === product.type.length) {
+      setIsDisabled(false)
+    } else {
+      setIsDisabled(true)
+    }
+
+    setType(newTypes)
+  }
+
   if (isLoading) {
     return (
       <div>
@@ -120,6 +184,13 @@ export default function Page({ params }) {
   return (
     <main>
       <Container className="p-3">
+        <div className='text-secondary d-flex gap-2'>
+          <Link className='text-reset text-decoration-none' href={'/shop'}>Categories</Link>
+          &gt;
+          <Link className='text-reset text-decoration-none' href={`/${product.category}`}>{product.category}</Link>
+          &gt;
+          <Link className='text-reset text-decoration-none' href={`/products/${product.id}`}>{product.name.join(' ')}</Link>
+        </div>
         <div className="rounded shadow p-5 mt-3 bg-light">
           <Row>
             <Col md={6} className="image-section">
@@ -129,34 +200,40 @@ export default function Page({ params }) {
             </Col>
 
             <Col md={6}>
-              <h2>{product.name}</h2>
-              <h4>{product.price}</h4>
-              <p>{product.desription}</p>
+              <p className='fs-2'>{product.name.join(' ')}</p>
+              <div className='d-flex justify-content-end'>
+                Rating (0) [stars]
+              </div>
+              <h2 className='text-primary'>{Intl.NumberFormat('en-CA', { style: 'currency', currency: 'PHP' }).format(product.price)}</h2>
+              <p className='mb-2 mt-4'><b>Item Description</b></p>
+              <p>{product.description}</p>
               {
-                product.type.map((type, idx) => {
-                  const keyparent = Object.keys(type)[0]
+                product.type.map((key, idx) => {
+                  const keyparent = Object.keys(key)[0]
 
-                  return <div key={`${idx}-${keyparent}`}>
-                    <h5>{keyparent}:</h5>
-                    <div className='d-flex gap-1'>
-                      {
-                        type[keyparent].map((typename, indx) => {
-                          const keychild = Object.keys(typename)[0]
-                          return <Button key={`${indx}-${keychild}`} onClick={() => setType(indx)} color="secondary">{keychild}</Button>
-                        })
-                      }
+                  return (
+                    <div className='mb-3' key={`${idx}-${keyparent}`}>
+                      <Row>
+                        <Col md={1} className='d-flex align-items-center'>
+                          <p className='m-0 fw-bold'>{keyparent}</p>
+                        </Col>
+                        <Col md={11}>
+                          <div className='d-flex gap-1'>
+                            <TypeButton data={key[keyparent]} keyname={keyparent} onClick={typeHandler} />
+                          </div>
+                        </Col>
+                      </Row>
                     </div>
-                  </div>
+                  )
                 })
               }
               <div className='d-flex align-items-center justify-content-end gap-1'>
-                <Button color="success" onClick={addcartbtn}>Add to Cart</Button>
-                <Button color="primary" onClick={buybtn}>Buy Now</Button>
+                <Button disabled={isDisabled} color="success" onClick={addcartbtn}>Add to Cart</Button>
+                <Button disabled={isDisabled} color="primary" onClick={buybtn}>Buy Now</Button>
               </div>
             </Col>
           </Row>
         </div>
-
         <div className="mt-3 p-5 shadow rounded bg-light">
           <h3>Customer Reviews</h3>
           {[1, 2, 3, 4].map((review, index) => (
@@ -172,14 +249,13 @@ export default function Page({ params }) {
         </div>
       </Container>
 
-      <section className="mt-5">
+      <section className="my-5">
         <Container>
-          <div className="d-flex justify-content-center mb-3">
-            <h1>Related Products</h1>
+          <div className='mb-4'>
+            <h3>Suggested</h3>
           </div>
           <Row>
             <Col md={4}>
-
               <div className="text-center mb-3">
                 <img className='w-100 mb-3' src="https://www.myperiwinkle.com/cdn/shop/files/ginee_20240927172409270_1110767406.png?v=1727429114&width=480" alt="Product 1" />
                 <h3>Product 1</h3>
