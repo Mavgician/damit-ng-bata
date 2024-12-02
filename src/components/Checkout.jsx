@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, createContext } from "react"
+import { useState, useEffect, createContext, useContext } from "react"
 import { convertToSubCurrency } from "@/lib/convertToSubcurrency"
 
 import {
   useStripe,
   useElements,
-  PaymentElement
+  PaymentElement,
+  AddressElement,
 } from '@stripe/react-stripe-js'
 
 import { Button, Form, Row, Col, Spinner } from "reactstrap"
@@ -15,20 +16,26 @@ import { convertToPhCurrency } from "@/lib/convertToPHCurrency"
 import { ConfirmationModal } from './modal_template'
 
 import Skeleton from "react-loading-skeleton"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 const PayContext = createContext(null)
 
-export function CheckoutPage({ amount }) {
+export function CheckoutPage({ amount, context, isLoading: isItemLoading }) {
   const stripe = useStripe()
   const elements = useElements()
 
   const [clientSecret, setClientSecret] = useState('')
+  const [savedLocations, setSavedLocations] = useState([]);
+
   const [loading, setLoading] = useState(false)
 
   const [isExit, setIsExit] = useState(false);
 
+  const { orders } = useContext(context)
+
   const router = useRouter()
+
+  const query = useSearchParams()
 
   async function submitHandler(e) {
     e.preventDefault()
@@ -36,7 +43,9 @@ export function CheckoutPage({ amount }) {
 
     if (!stripe || !elements) return
 
-    const { error: submitError } = await elements.submit()
+    const { selectedPaymentMethod: payment_mode, error: submitError } = await elements.submit()
+
+    const { isNewAddress, value: address } = await elements.getElement('address').getValue()
 
     if (submitError) {
       console.warn(submitError.message)
@@ -44,11 +53,35 @@ export function CheckoutPage({ amount }) {
       return
     }
 
+    if (isNewAddress) {
+      fetch(
+        'api/user/add-address',
+        {
+          method: 'POST',
+          body: JSON.stringify({ ...address })
+        }
+      )
+    }
+
+    for (let i = 0; i < orders.length; i++) {
+      fetch(
+        `api/order/pay`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            id: orders[i].id,
+            amount: orders[i].amount,
+            payment_mode: payment_mode
+          })
+        }
+      )
+    }
+
     const { error } = await stripe.confirmPayment({
       elements,
       clientSecret,
       confirmParams: {
-        return_url: `${window.location.origin}/checkout-success`
+        return_url: `${window.location.origin}/checkout-success?amount=${amount}`
       }
     })
 
@@ -57,6 +90,20 @@ export function CheckoutPage({ amount }) {
     }
 
     setLoading(false)
+  }
+
+  async function cancelHandler() {
+    if (query.get('is_buying')) {
+      fetch('api/order/update-status', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: query.get('order_id'),
+          status: 'cancelled'
+        })
+      })
+    }
+
+    router.back()
   }
 
   useEffect(() => {
@@ -69,6 +116,15 @@ export function CheckoutPage({ amount }) {
     })
       .then(res => res.json())
       .then(data => setClientSecret(data.clientSecret))
+
+    fetch('api/user/get-address', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then(data => setSavedLocations(data))
   }, [amount]);
 
   if (!clientSecret || !stripe || !elements) {
@@ -107,22 +163,42 @@ export function CheckoutPage({ amount }) {
 
   return (
     <>
-      <PayContext.Provider value={{ isOpen: isExit, setIsOpen: setIsExit, cancel: () => { }, submit: () => router.back()}}>
+      <PayContext.Provider value={{ isOpen: isExit, setIsOpen: setIsExit, submit: cancelHandler }}>
         <ConfirmationModal context={PayContext}>
           You are about to cancel your payment.
         </ConfirmationModal>
       </PayContext.Provider>
       <Form onSubmit={submitHandler}>
-        {clientSecret && <PaymentElement onChange={e => console.log(e)}/>}
+        <div className="mb-4">
+          <h5 className='m-0 fw-normal'>1. Fill out payment information</h5>
+          <div>{clientSecret && <PaymentElement />}</div>
+          <hr />
+          <h5 className='m-0 my-4 fw-normal'>2. Select an address</h5>
+          <div>
+            {clientSecret &&
+              <AddressElement
+                onSubmit={(e) => { console.log(e) }}
+                options={{
+                  mode: 'shipping',
+                  fields: { phone: 'always' },
+                  validation: {
+                    phone: { required: 'always' }
+                  },
+                  contacts: savedLocations
+                }}
+              />
+            }
+          </div>
+        </div>
         <Row>
           <Col className="pe-1" md={2}>
-            <Button onClick={() => setIsExit(true)} className="my-4 w-100 py-3" size="lg" color="danger">
+            <Button onClick={() => setIsExit(true)} className="w-100 py-3" size="lg" color="danger">
               Cancel
             </Button>
           </Col>
           <Col className="ps-1" md={10}>
-            <Button onClick={submitHandler} disabled={!stripe || loading} className="my-4 w-100 py-3" size="lg" color="dark">
-              {!loading ? <b>Pay {convertToPhCurrency(amount)}</b> : <Spinner size={'sm'}/>}
+            <Button type="submit" disabled={!stripe || loading || isItemLoading} className="w-100 py-3" size="lg" color="dark">
+              {!loading ? <b>Pay {convertToPhCurrency(amount)}</b> : <Spinner size={'sm'} />}
             </Button>
           </Col>
         </Row>
