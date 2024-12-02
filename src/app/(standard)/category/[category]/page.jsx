@@ -74,7 +74,7 @@ export default function Page({ params }) {
               isLoading ?
                 <>
                   {[...Array(8)].map((_, idx) =>
-                    <Col key={`skeleton-${idx}-${params.category}`} md={3}>
+                    <Col key={`skeleton-loader-${params.category}-${idx}`} md={3}>
                       <div className='mb-2'>
                         <Skeleton height={300} />
                       </div>

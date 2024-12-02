@@ -122,7 +122,7 @@ export default function Page() {
     <main className='row bg-light'>
       <Col md={3} className='position-relative p-0'>
         <div className='position-sticky w-100 end-0 ps-5 py-4' style={{ top: 56 }}>
-          <div className='border border p-4 rounded' style={{background: 'white'}}>
+          <div className='border border p-4 rounded' style={{ background: 'white' }}>
             <h1 className='m-0'><b>Damit ng Bata</b></h1>
             <p className='my-2 fs-3'>Search filters</p>
             <Form onSubmit={e => {
@@ -198,8 +198,8 @@ export default function Page() {
             <Row>
               {
                 isLoading || loader ?
-                  [...Array(8)].map((idx) =>
-                    <Col key={`skeleton-loader-${idx}`} md={3}>
+                  [...Array(8)].map((_, idx) =>
+                    <Col key={`skeleton-loader-shop-${idx}`} md={3}>
                       <div className='mb-2'>
                         <Skeleton height={300} />
                       </div>
