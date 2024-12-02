@@ -20,15 +20,7 @@ import Link from "next/link";
 import { convertToPhCurrency } from '@/lib/convertToPHCurrency';
 
 export default function CartPage() {
-  const { data: cartItems, isLoading } = useSWR(
-    [`${window.location.origin}/api/user/cart`],
-    ([url]) =>
-      fetchParsed(url,
-        {
-          method: 'POST'
-        }
-      )
-  )
+  const { data: pending_order, isLoading } = useSWR('api/order/get-all-pending', fetchParsed)
 
   const [itemsTemp, setItemsTemp] = useState([]);
 
@@ -40,7 +32,7 @@ export default function CartPage() {
     )
 
     fetch(
-      `${window.location.origin}/api/user/update-cart`,
+      'api/order/update',
       {
         method: 'POST',
         body: JSON.stringify({
@@ -55,23 +47,62 @@ export default function CartPage() {
     setItemsTemp(itemsTemp.filter(item => item.id != id));
 
     fetch(
-      `${window.location.origin}/api/user/remove-cart`,
+      'api/order/update-status',
       {
         method: 'POST',
         body: JSON.stringify({
-          id: id
+          id: id,
+          status: 'cancelled'
         })
       }
     )
   }
 
   const calculateTotal = () => {
-    return itemsTemp.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    return itemsTemp.reduce((acc, item) => item.is_checkout ? acc + item.price * item.quantity : acc + 0, 0);
+  }
+
+  const checkboxHandler = (id) => {
+    setItemsTemp(
+      itemsTemp.map((item) => {
+        if (item.id === id) {
+          fetch(
+            'api/order/update',
+            {
+              method: 'POST',
+              body: JSON.stringify({
+                id: id,
+                is_checkout: !item.is_checkout
+              })
+            }
+          )
+
+          return { ...item, is_checkout: !item.is_checkout }
+        } else {
+          return item
+        }
+      })
+    )
   }
 
   useEffect(() => {
     if (!isLoading) {
-      setItemsTemp(cartItems)
+      let items = []
+      pending_order.data.forEach(item => {
+        const product = item.product_ref.data
+
+        items.push({
+          id: item.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          imageUrl: product.thmburl.url,
+          quantity: item.quantity,
+          type: item.type,
+          is_checkout: item.is_checkout
+        })
+      })
+      setItemsTemp(items)
     }
   }, [isLoading]);
 
@@ -84,11 +115,11 @@ export default function CartPage() {
             {
               itemsTemp.length > 0 ? (
                 itemsTemp.map(item => (
-                  <div key={item.id} style={{ borderBottom: '1px solid #ccc', paddingBottom: '20px' }}>
+                  <div key={item.id} className='border-bottom my-4 pb-4'>
                     <Row>
                       <Col md={1} className="d-flex align-items-center justify-content-center">
                         <FormGroup>
-                          <Input type="checkbox" className="border-dark" style={{height: '25px', width: '25px'}}/>
+                          <Input checked={item.is_checkout} onChange={() => checkboxHandler(item.id)} type="checkbox" className="border-dark" style={{height: '25px', width: '25px'}}/>
                         </FormGroup>
                       </Col>
                       <Col md={2}>
@@ -128,7 +159,7 @@ export default function CartPage() {
                             <Button
                               color="dark"
                               onClick={() => removeItem(item.id)}
-                              style={{ padding: '0.5rem 3rem' }}
+                              className='px-5 py-2'
                             >
                               Remove
                             </Button>
