@@ -56,9 +56,9 @@ export function Orders() {
                   statusPill += 'secondary'
                   break;
               }
-
+              
               return (
-                <div className='p-4 border mb-3 rounded' style={{ background: 'white' }}>
+                <div key={order.id} className='p-4 border mb-3 rounded' style={{ background: 'white' }}>
                   <div className="d-flex align-items-center">
                     <h5 className='text-uppercase m-0'>
                       {product.category}
