@@ -24,7 +24,15 @@ export function ModalFrame({
   children = [],
   context
 }) {
-  const { isOpen, setIsOpen, submit, cancel, isSubmitLoading  } = useContext(context)
+  let { isOpen, setIsOpen, submit, cancel, isSubmitLoading  } = useContext(context)
+
+  if (!cancel) {
+    cancel = () => {}
+  }
+
+  if (!submit) {
+    submit = () => {}
+  }
 
   const toggle = () => {
     if (isSubmitLoading) return
