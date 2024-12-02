@@ -22,7 +22,7 @@ const ADMIN_PATHS = [
 const rule = new RegExp(options.allowRule)
 
 export const config = {
-    matcher: ['/login:path*', '/admin:path*', '/cart:path*', '/profile:path*', '/register/:path*'],
+    matcher: ['/login:path*', '/admin-dashboard:path*', '/cart:path*', '/profile:path*', '/register/:path*', '/checkout:path*', '/checkout-success:path*'],
 }
 
 export default async function middleware(req) {

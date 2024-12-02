@@ -47,7 +47,7 @@ export async function POST(req, { params }) {
     const { currentUser, body, newUserdata } = await init(req)
 
     if (!currentUser) {
-        return NextResponse.json({ message: 'User not logged in' }, { status: 401 })
+        return NextResponse.json({ message: 'User not logged in', authorized: false }, { status: 401 })
     }
 
     const document = doc(db, 'users', currentUser.uid)
@@ -58,7 +58,7 @@ export async function POST(req, { params }) {
 
     try {
         if (!userDocRaw.exists()) {
-            return NextResponse.json({ message: 'User does not exist' }, { status: 404 })
+            return NextResponse.json({ message: 'User does not exist', authorized: false }, { status: 404 })
         }
 
         switch (params.slug) {
@@ -78,7 +78,7 @@ export async function POST(req, { params }) {
                 break;
 
             case 'verify':
-                return NextResponse.json({ ...userDoc }, { status: 200 })
+                return NextResponse.json({ ...userDoc, authorized: true }, { status: 200 })
 
             case 'list':
                 if (userDoc.type === 'admin') {

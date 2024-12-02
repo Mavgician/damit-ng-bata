@@ -151,9 +151,13 @@ export default function Page({ params }) {
       })
     })
   )
-  
-  console.log(ratingAverage);
-  
+
+  const { data: firestoreUser, isLoading: isUserLoading } = useSWR(
+    ['/api/user/verify'],
+    ([url]) => fetchParsed(url, {
+      method: 'POST'
+    })
+  )
 
   const [type, setType] = useState([]);
   const [quantity, setQuantity] = useState(1);
@@ -163,6 +167,16 @@ export default function Page({ params }) {
   const router = useRouter()
 
   function addcartbtn() {
+    if (!firestoreUser.authorized) {
+      router.push({
+        pathname: '/login',
+        query: {
+          target: `/products/${params.id}`
+        }
+      })
+      return
+    }
+
     fetch(
       '/api/order/create',
       {
@@ -178,6 +192,16 @@ export default function Page({ params }) {
   }
 
   async function buybtn() {
+    if (!firestoreUser.authorized) {
+      router.push({
+        pathname: '/login',
+        query: {
+          target: `/products/${params.id}`
+        }
+      })
+      return
+    }
+
     const { id } = await (await fetch('/api/order/create', {
       method: 'POST',
       body: JSON.stringify({
@@ -228,7 +252,7 @@ export default function Page({ params }) {
     setType(newTypes)
   }
 
-  if (isProductLoading) {
+  if (isProductLoading || isUserLoading) {
     return (
       <div>
         <Spinner></Spinner>
