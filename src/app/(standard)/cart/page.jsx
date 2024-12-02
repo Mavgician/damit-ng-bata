@@ -18,6 +18,7 @@ import useSWR from "swr";
 import Link from "next/link";
 
 import { convertToPhCurrency } from '@/lib/convertToPHCurrency';
+import Skeleton from 'react-loading-skeleton';
 
 export default function CartPage() {
   const { data: pending_order, isLoading } = useSWR('api/order/get-all-pending', fetchParsed)
@@ -113,65 +114,100 @@ export default function CartPage() {
           <Col md="8">
             <h4 className="mb-4">Your cart</h4>
             {
-              itemsTemp.length > 0 ? (
-                itemsTemp.map(item => (
-                  <div key={item.id} className='border-bottom my-4 pb-4'>
+              !isLoading ? (
+                itemsTemp.length > 0 ?
+                  itemsTemp.map(item => (
+                    <div key={item.id} className='border-bottom my-4 pb-4'>
+                      <Row>
+                        <Col md={1} className="d-flex align-items-center justify-content-center">
+                          <FormGroup>
+                            <Input checked={item.is_checkout} onChange={() => checkboxHandler(item.id)} type="checkbox" className="border-dark" style={{ height: '25px', width: '25px' }} />
+                          </FormGroup>
+                        </Col>
+                        <Col md={2}>
+                          <Link href={`${window.location.origin}/products/${item.id}`}>
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name.join(' ')}
+                              className="w-100"
+                              style={{ objectFit: 'cover' }}
+                            />
+                          </Link>
+                        </Col>
+                        <Col>
+                          <div>
+                            <div className="d-flex">
+                              <h6>{item.name.join(' ')}</h6>
+                              <h6 className='ms-auto m-0 text-primary'>{convertToPhCurrency(item.price * item.quantity)}</h6>
+                            </div>
+                            <p className="text-muted">{item.description}</p>
+                            <div className="d-flex gap-3 mb-3">
+                              {
+                                item.type.map(type => <p key={`${type.key}-${type.value}`} className="m-0"><b>{type.key}:</b> {type.value}</p>)
+                              }
+                            </div>
+                            <div className="d-flex align-items-center justify-content-end">
+                              <p className="me-2 mb-0">Quantity:</p>
+                              <div className="flex-shrink-1">
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  value={item.quantity}
+                                  onChange={e => updateQuantity(item.id, parseInt(e.target.value))}
+                                />
+                              </div>
+                            </div>
+                            <div className="d-flex justify-content-between mt-3">
+                              <Button
+                                color="dark"
+                                onClick={() => removeItem(item.id)}
+                                className='px-5 py-2'
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          </div>
+                        </Col>
+                      </Row>
+                    </div>
+                  ))
+                  :
+                  <div>You have no items in your cart.</div>
+              ) : (
+                [...Array(3)].map((_, idx) => (
+                  <div key={`skeleton-loader-cart-${idx}`} className='border-bottom my-4 pb-4'>
                     <Row>
-                      <Col md={1} className="d-flex align-items-center justify-content-center">
-                        <FormGroup>
-                          <Input checked={item.is_checkout} onChange={() => checkboxHandler(item.id)} type="checkbox" className="border-dark" style={{height: '25px', width: '25px'}}/>
-                        </FormGroup>
-                      </Col>
+                      <Col md={1}></Col>
                       <Col md={2}>
-                        <Link href={`${window.location.origin}/products/${item.id}`}>
-                          <img
-                            src={item.imageUrl}
-                            alt={item.name.join(' ')}
-                            className="w-100"
-                            style={{ objectFit: 'cover' }}
-                          />
-                        </Link>
+                        <Skeleton height={120}></Skeleton>
                       </Col>
                       <Col>
                         <div>
-                          <div className="d-flex">
-                            <h6>{item.name.join(' ')}</h6>
-                            <h6 className='ms-auto m-0 text-primary'>{convertToPhCurrency(item.price * item.quantity)}</h6>
-                          </div>
-                          <p className="text-muted">{item.description}</p>
-                          <div className="d-flex gap-3 mb-3">
-                            {
-                              item.type.map(type => <p key={`${type.key}-${type.value}`} className="m-0"><b>{type.key}:</b> {type.value}</p>)
-                            }
-                          </div>
-                          <div className="d-flex align-items-center justify-content-end">
-                            <p className="me-2 mb-0">Quantity:</p>
-                            <div className="flex-shrink-1">
-                              <Input
-                                type="number"
-                                min="1"
-                                value={item.quantity}
-                                onChange={e => updateQuantity(item.id, parseInt(e.target.value))}
-                              />
-                            </div>
-                          </div>
-                          <div className="d-flex justify-content-between mt-3">
-                            <Button
-                              color="dark"
-                              onClick={() => removeItem(item.id)}
-                              className='px-5 py-2'
-                            >
-                              Remove
-                            </Button>
-                          </div>
+                          <Row>
+                            <Col><Skeleton></Skeleton></Col>
+                            <Col></Col>
+                            <Col md={2}><Skeleton></Skeleton></Col>
+                          </Row>
+                          <Row>
+                            <Col><Skeleton></Skeleton></Col>
+                            <Col></Col>
+                          </Row>
+                          <Row className='mt-2'>
+                            <Col md={2}><Skeleton></Skeleton></Col>
+                          </Row>
+                          <Row>
+                            <Col></Col>
+                            <Col md={3}><Skeleton height={33}></Skeleton></Col>
+                          </Row>
+                          <Row>
+                            <Col md={4}><Skeleton height={33}></Skeleton></Col>
+                            <Col></Col>
+                          </Row>
                         </div>
                       </Col>
                     </Row>
                   </div>
                 ))
-
-              ) : (
-                <p>Your cart is empty.</p>
               )}
           </Col>
           <Col md="4">

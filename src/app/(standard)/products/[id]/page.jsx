@@ -27,6 +27,8 @@ import '@/lib/react-innner-image-zoom.min.css'
 import Link from 'next/link';
 import useRouter from '@/lib/custom-useRouter';
 
+import Skeleton from 'react-loading-skeleton';
+
 const ProductContext = createContext(null)
 
 function ProductGallery({ images }) {
@@ -259,9 +261,62 @@ export default function Page({ params }) {
 
   if (isProductLoading || isUserLoading) {
     return (
-      <div>
-        <Spinner></Spinner>
-      </div>
+      <main>
+        <Container className='p-3'>
+          <p className="my-3">
+            <Skeleton></Skeleton>
+          </p>
+          <div className="mt-3 p-5 border rounded" style={{ background: 'white' }}>
+            <Row>
+              <Col md={6}>
+                <Skeleton height={600}></Skeleton>
+              </Col>
+              <Col md={6}>
+                <Row>
+                  <Col><p className='fs-2'><Skeleton></Skeleton></p></Col>
+                  <Col></Col>
+                </Row>
+                <Row>
+                  <Col></Col>
+                  <Col md={3}><Skeleton></Skeleton></Col>
+                </Row>
+                <Row>
+                  <Col md={3}><h2><Skeleton></Skeleton></h2></Col>
+                </Row>
+                <Skeleton count={8}></Skeleton>
+                <Row className='mt-3'>
+                  <Col md={2}><Skeleton height={30}></Skeleton></Col>
+                  <Col md={4}><Skeleton height={30}></Skeleton></Col>
+                </Row>
+                <Row className='mt-3'>
+                  <Col md={2}><Skeleton height={30}></Skeleton></Col>
+                  <Col md={4}><Skeleton height={30}></Skeleton></Col>
+                </Row>
+                <Row className='mt-3'>
+                  <Col></Col>
+                  <Col>
+                    <Row>
+                      <Col><Skeleton height={30}></Skeleton></Col>
+                      <Col><Skeleton height={30}></Skeleton></Col>
+                    </Row>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          </div>
+          <div className="mt-3 p-5 border rounded" style={{ background: 'white' }}>
+            <h3 className='mb-3'>Customer Reviews (0)</h3>
+            <div className='border rounded p-3 mb-2'>
+              <Row className='mb-3'>
+                <Col md={4}><Skeleton></Skeleton></Col>
+                <Col></Col>
+                <Col md={2}><Skeleton></Skeleton></Col>
+              </Row>
+              <Skeleton count={3}></Skeleton>
+            </div>
+          </div>
+        </Container>
+      </main>
     )
   }
 
