@@ -33,13 +33,13 @@ export function Footer() {
             </Col>
             <Col md="2" lg="2" xl="2" className="mx-auto mb-4">
               <h6 className="text-uppercase fw-bold mb-4">Products</h6>
-              <Link href="#!" className="text-decoration-none d-block text-white">
+              <Link href="/about-us" className="text-decoration-none d-block text-white">
                 About Us
               </Link>
-              <Link href="#!" className="text-decoration-none d-block text-white">
+              <Link href="/category/boys" className="text-decoration-none d-block text-white">
                 Boys
               </Link>
-              <Link href="#!" className="text-decoration-none d-block text-white">
+              <Link href="/category/girls" className="text-decoration-none d-block text-white">
                 Girls
               </Link>
             </Col>
@@ -47,17 +47,11 @@ export function Footer() {
               <h6 className="text-uppercase fw-bold mb-4">
                 Useful links
               </h6>
-              <Link href="#!" className="text-decoration-none d-block text-white">
-                Pricing
-              </Link>
-              <Link href="#!" className="text-decoration-none d-block text-white">
+              <Link href="/profile" className="text-decoration-none d-block text-white">
                 Settings
               </Link>
-              <Link href="#!" className="text-decoration-none d-block text-white">
+              <Link href="/profile" className="text-decoration-none d-block text-white">
                 Orders
-              </Link>
-              <Link href="#!" className="text-decoration-none d-block text-white">
-                Help
               </Link>
             </Col>
             <Col md="4" lg="3" xl="3" className="mx-auto mb-md-0 mb-4">
