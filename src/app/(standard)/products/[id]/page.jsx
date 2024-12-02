@@ -185,7 +185,8 @@ export default function Page({ params }) {
         quantity: quantity,
         type: type,
         amount: product.price * quantity,
-        is_checkout: true
+        is_checkout: true,
+        is_buying: true,
       })
     })).json()
 
