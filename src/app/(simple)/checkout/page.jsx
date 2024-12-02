@@ -45,9 +45,6 @@ export default function Page() {
     }
   }, []);
 
-  console.log(orders);
-  
-
   return (
     <main className="min-vh-100 py-5 d-flex justify-content-center align-items-center">
       <Container>

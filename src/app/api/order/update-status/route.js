@@ -8,16 +8,16 @@ export async function POST(req) {
     const { id, status } = await req.json()
     const document = doc(db, 'orders', id)
 
-    if (status != 'success' || status != 'cancelled' || status != 'pending') {
+    if (status == 'success' || status == 'cancelled' || status == 'pending') {
+      let payload = {
+        last_modified: Timestamp.now(),
+        status,
+      }
+
+      await updateDoc(document, payload)
+    } else {
       return NextResponse.json({ message: 'Status is not allowed!' }, { status: 401 })
     }
-
-    let payload = {
-      last_modified: Timestamp.now(),
-      status,
-    }
-
-    await updateDoc(document, payload)
 
   } catch (error) {
     console.warn(error)
