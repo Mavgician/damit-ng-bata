@@ -38,3 +38,7 @@ next-env.d.ts
 # Firebase API keys
 firebase-service-account.json
 .vercel
+
+# ACME
+tmp
+tmp/*
