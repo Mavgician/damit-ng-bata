@@ -1,5 +1,7 @@
 'use client';
 
+import { convertToPhCurrency } from '@/lib/convertToPHCurrency'
+
 import {
   Container,
   Row,
@@ -36,7 +38,7 @@ export default function Page({ params }) {
     }))
 
   return (
-    <main>
+    <main className='bg-light'>
       <section className="product-grid">
         <Container>
           <div className='text-secondary d-flex gap-2'>
@@ -85,28 +87,29 @@ export default function Page({ params }) {
                 :
                 product.data.length > 0 ?
                   product.data.map((product, idx) => (
-                    <Col md={3} key={idx} className='mb-4'>
-                      <Link
-                        className='text-reset text-decoration-none'
-                        href={{
-                          pathname: `/products/${product.id}`,
-                          query: { category: params.category }
-                        }}
-                      >
-                        <div className="product-item">
-                          <div className='d-flex align-items-center justify-content-center product-image'>
-                            <img src={product.thmburl.url} alt={product.thmburl.id} />
-                          </div>
-                          <h5 className='text-truncate'>{product.name.join(' ')}</h5>
-                          <div className="d-flex">
-                            <h5>{Intl.NumberFormat('en-CA', { style: 'currency', currency: 'PHP' }).format(product.price)}</h5>
+                    <Col md={3} key={idx} className='p-2'>
+                      <div className='rounded border p-3' style={{background: 'white'}}>
+                        <Link
+                          className='text-reset text-decoration-none'
+                          href={{
+                            pathname: `/products/${product.id}`,
+                            query: { category: params.category }
+                          }}
+                        >
+                          <div className="product-item">
+                            <div className='d-flex align-items-center justify-content-center product-image'>
+                              <img src={product.thmburl.url} alt={product.thmburl.id} />
+                            </div>
+                            <h5 className='text-truncate'>{product.name.join(' ')}</h5>
                             <div className='flex-grow-1 d-flex justify-content-end'>
                               stars
                             </div>
+                            <div className="d-flex">
+                              <h5>{convertToPhCurrency(product.price)}</h5>
+                            </div>
                           </div>
-                          <p>{product.description}</p>
-                        </div>
-                      </Link>
+                        </Link>
+                      </div>
                     </Col>
                   ))
                   :

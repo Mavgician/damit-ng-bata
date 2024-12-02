@@ -119,10 +119,10 @@ export default function Page() {
   }, [product]);
 
   return (
-    <main className='row'>
+    <main className='row bg-light'>
       <Col md={3} className='position-relative p-0'>
         <div className='position-sticky w-100 end-0 ps-5 py-4' style={{ top: 56 }}>
-          <div className='border border-dark p-4 rounded'>
+          <div className='border border p-4 rounded' style={{background: 'white'}}>
             <h1 className='m-0'><b>Damit ng Bata</b></h1>
             <p className='my-2 fs-3'>Search filters</p>
             <Form onSubmit={e => {
@@ -210,27 +210,29 @@ export default function Page() {
                   )
                   :
                   product.data.length > 0 && product.data.map((product, idx) => (
-                    <Col xs={6} md={4} lg={3} key={idx} className='mb-4'>
-                      <Link
-                        className='text-reset text-decoration-none'
-                        href={{
-                          pathname: `/products/${product.id}`,
-                        }}
-                      >
-                        <div className="product-item">
-                          <div className='d-flex align-items-center justify-content-center product-image'>
-                            <img src={product.thmburl.url} alt={product.thmburl.id} />
-                          </div>
-                          <h5 className='text-truncate'>{product.name.join(' ')}</h5>
-                          <div className="d-flex">
-                            <h5>{convertToPhCurrency(product.price)}</h5>
+                    <Col md={3} key={idx} className='p-2'>
+                      <div className='rounded border p-3' style={{ background: 'white' }}>
+                        <Link
+                          className='text-reset text-decoration-none'
+                          href={{
+                            pathname: `/products/${product.id}`,
+                            query: { category: product.category }
+                          }}
+                        >
+                          <div className="product-item">
+                            <div className='d-flex align-items-center justify-content-center product-image'>
+                              <img src={product.thmburl.url} alt={product.thmburl.id} />
+                            </div>
+                            <h5 className='text-truncate'>{product.name.join(' ')}</h5>
                             <div className='flex-grow-1 d-flex justify-content-end'>
                               stars
                             </div>
+                            <div className="d-flex">
+                              <h5>{convertToPhCurrency(product.price)}</h5>
+                            </div>
                           </div>
-                          <p>{product.description}</p>
-                        </div>
-                      </Link>
+                        </Link>
+                      </div>
                     </Col>
                   ))
               }

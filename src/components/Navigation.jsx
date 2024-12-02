@@ -128,14 +128,7 @@ function ProfilePopup({ user, firestoreUser }) {
   )
 }
 
-/* function ProfileButtonTrigger({ user, size }) {
-  const imageUrl = user?.photoURL ?? "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=" + (user?.displayName ?? user?.email);
-  return (
-    <img src={imageUrl} alt="profile" height={size} width={size} className="rounded-circle" style={{ cursor: "pointer" }} />
-  );
-}; */
-
-export function Navigationbar({ transparent = false, isFixed = true }) {
+export function Navigationbar({ isFixed = true }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
@@ -148,9 +141,9 @@ export function Navigationbar({ transparent = false, isFixed = true }) {
     <>
       <Navbar
         expand='md'
-        color={transparent ? 'transparent' : 'light'}
         fixed={isFixed ? 'top' : undefined}
-        style={transparent ? { boxShadow: 'none' } : undefined}
+        style={{background: 'white'}}
+        className='shadow-sm'
       >
         <Container className="position-relative d-flex w-100 h-100">
           <NavbarBrand href='/' style={{ transform: 'translate(-50%, -50%)' }} className='d-flex align-items-center position-absolute start-50 top-50'>

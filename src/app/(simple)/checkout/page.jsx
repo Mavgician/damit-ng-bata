@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation'
 
 import { CheckoutPage } from '@/components/Checkout'
 import { Container, Row, Col, Button } from 'reactstrap'
-import { convertToPhCurrency } from '@/src/lib/convertToPHCurrency'
+import { convertToPhCurrency } from '@/lib/convertToPHCurrency'
 import { createContext, useEffect, useState } from 'react'
 
 import Skeleton from 'react-loading-skeleton'
