@@ -8,7 +8,7 @@ const useRouter = () => {
     query,
   }: {
     pathname: string
-    query: Record<string, any>
+    query: Record<string, string>
   }) => {
     const generateQuery = new URLSearchParams(query).toString()
 

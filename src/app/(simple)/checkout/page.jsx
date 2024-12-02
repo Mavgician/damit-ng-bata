@@ -7,7 +7,7 @@ import { Elements } from '@stripe/react-stripe-js'
 import { useSearchParams } from 'next/navigation'
 
 import { CheckoutPage } from '@/components/Checkout'
-import { Container, Row, Col, Button } from 'reactstrap'
+import { Container, Row, Col } from 'reactstrap'
 import { convertToPhCurrency } from '@/lib/convertToPHCurrency'
 import { createContext, useEffect, useState } from 'react'
 
@@ -44,6 +44,9 @@ export default function Page() {
         })
     }
   }, []);
+
+  console.log(orders);
+  
 
   return (
     <main className="min-vh-100 py-5 d-flex justify-content-center align-items-center">
@@ -96,7 +99,7 @@ export default function Page() {
                 <>
                   {
                     orders.map(order => (
-                      <div className='my-4'>
+                      <div key={order.id} className='my-4'>
                         <div className="d-flex">
                           <p className='m-0'>{order.product_ref.data.name.join(' ')}</p>
                           <p className='m-0 flex-grow-1 text-end'>{convertToPhCurrency(order.product_ref.data.price * order.quantity)}</p>
