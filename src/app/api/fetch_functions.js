@@ -12,7 +12,7 @@ import {
   where
 } from 'firebase/firestore';
 
-export async function fetchCollectionItems(collection, orderByKey, order = 'asc', searchLimit = 10, firstDoc, lastDoc, filter) {
+export async function fetchCollectionItems({collection, orderByKey = 'creation', order = 'desc', searchLimit = 10, firstDoc, lastDoc, filter}) {
   let data = []
   let queryRef
 

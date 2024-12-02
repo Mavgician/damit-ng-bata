@@ -33,8 +33,7 @@ async function init(req) {
                 last: body?.last_name ?? null
             },
             orders: [],
-            ratings: [],
-            cart: [],
+            reviews: [],
             type: 'user'
         }
     } catch {
@@ -58,6 +57,10 @@ export async function POST(req, { params }) {
     let updated
 
     try {
+        if (!userDocRaw.exists()) {
+            return NextResponse.json({ message: 'User does not exist' }, { status: 404 })
+        }
+
         switch (params.slug) {
             case 'add':
                 await setDoc(document, newUserdata)
@@ -75,23 +78,20 @@ export async function POST(req, { params }) {
                 break;
 
             case 'verify':
-                if (userDocRaw.exists()) {
-                    return NextResponse.json({ ...userDoc }, { status: 200 })
-                } else {
-                    return NextResponse.json({ message: 'User does not exist' }, { status: 404 })
-                }
+                return NextResponse.json({ ...userDoc }, { status: 200 })
 
             case 'list':
                 if (userDoc.type === 'admin') {
                     const collectionRef = collection(db, 'users')
-                    const items = await fetchCollectionItems(
-                        collectionRef,
-                        body.orderBy,
-                        body.order,
-                        body.limit,
-                        body.firstDoc,
-                        body.lastDoc,
-                    )
+                    const items = await fetchCollectionItems({
+                        collection: collectionRef,
+                        orderByKey: body.orderBy,
+                        order: body.order,
+                        limit: body.limit,
+                        firstDoc: body.firstDoc,
+                        lastDoc: body.lastDoc,
+                        filter: body.search
+                    })
 
                     return NextResponse.json(items, { status: 200 })
                 } else if (userDoc.type !== 'admin') {
@@ -119,6 +119,26 @@ export async function POST(req, { params }) {
                 }
 
                 return NextResponse.json(itemsParsed, { status: 200 })
+
+            case 'add-address':
+                await updateDoc(document, {
+                    locations: arrayUnion({
+                        name: body.name,
+                        phone: body.phone,
+                        address: {
+                            line1: body.address.line1,
+                            line2: body.address.line2,
+                            city: body.address.city,
+                            country: body.address.country,
+                            postal_code: body.address.postal_code,
+                            state: body.address.state
+                        }
+                    })
+                })
+                break
+
+            case 'get-address':
+                return NextResponse.json(userDoc.locations, { status: 200 })
 
             case 'add-cart':
                 await updateDoc(document, {
@@ -159,7 +179,7 @@ export async function POST(req, { params }) {
                 return NextResponse.json({ error: 'Unknown fetch type' }, { status: 501 })
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return NextResponse.json({ error: 'Wrong request body' }, { status: 500 })
     }
 

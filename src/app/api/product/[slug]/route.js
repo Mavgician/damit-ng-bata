@@ -112,15 +112,15 @@ export async function POST(req, { params }) {
         break
 
       case 'list':
-        const items = await fetchCollectionItems(
-          collectionRef,
-          body.orderBy,
-          body.order,
-          body.limit,
-          body.firstDoc,
-          body.lastDoc,
-          body.search
-        )
+        const items = await fetchCollectionItems({
+          collection: collectionRef,
+          orderByKey: body.orderBy,
+          order: body.order,
+          limit: body.limit,
+          firstDoc: body.firstDoc,
+          lastDoc: body.lastDoc,
+          filter: body.search
+        })
 
         return NextResponse.json(items, { status: 200 })
 
