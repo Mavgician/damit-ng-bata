@@ -23,7 +23,6 @@ import { useDebouncedCallback } from 'use-debounce';
 
 import Skeleton from 'react-loading-skeleton';
 
-
 export default function Page() {
   const [productName, setProductName] = useState('');
   const [ghostName, setGhostName] = useState('');

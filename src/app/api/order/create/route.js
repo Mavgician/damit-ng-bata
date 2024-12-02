@@ -29,9 +29,13 @@ export async function POST(req) {
       }
 
       if (order_product_id == product_id) {
-        isExisting = true
-        order_ref = user_order_ref
-        break
+        const order_data = (await getDoc(user_order_ref)).data()
+
+        if (order_data.status == 'pending') {
+          order_ref = user_order_ref
+          isExisting = true
+          break
+        }
       }
     }
 

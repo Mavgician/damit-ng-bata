@@ -13,9 +13,10 @@ import {
 } from 'reactstrap';
 
 import { RateButton } from '@/components/RateButton'
+import { ModalFrame } from '@/components/modal_template'
 
 import { fetchParsed } from '@/lib/fetch-parsed'
-import { useState } from 'react';
+import { useState, createContext } from 'react';
 import { convertToPhCurrency } from '@/src/lib/convertToPHCurrency';
 
 import useSWR from 'swr';
@@ -26,6 +27,7 @@ import '@/lib/react-innner-image-zoom.min.css'
 import Link from 'next/link';
 import useRouter from '@/lib/custom-useRouter';
 
+const ProductContext = createContext(null)
 
 function ProductGallery({ images }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -163,6 +165,7 @@ export default function Page({ params }) {
   const [quantity, setQuantity] = useState(1);
 
   const [isDisabled, setIsDisabled] = useState(true);
+  const [isAlert, setIsAlert] = useState(false);
 
   const router = useRouter()
 
@@ -189,6 +192,8 @@ export default function Page({ params }) {
         })
       }
     )
+
+    setIsAlert(true)
   }
 
   async function buybtn() {
@@ -262,6 +267,11 @@ export default function Page({ params }) {
 
   return (
     <main className='bg-light py-4'>
+      <ProductContext.Provider value={{ isOpen: isAlert, setIsOpen: setIsAlert }}>
+        <ModalFrame context={ProductContext}>
+          <p className='my-3'><b className='text-primary'>{product.name.join(' ')}</b> has been added to the cart!</p>
+        </ModalFrame>
+      </ProductContext.Provider>
       <Container className="p-3">
         <div className='text-secondary d-flex gap-2'>
           <Link className='text-reset text-decoration-none' href={'/shop'}>Categories</Link>
