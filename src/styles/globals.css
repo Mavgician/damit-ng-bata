@@ -10,8 +10,13 @@
   color: inherit;
 }
 
+html, body {
+  overflow-x: hidden;
+}
+
 main {
   min-height: calc(100vh - 56px);
+  overflow-x: hidden;
 }
 
 /*Home page image*/
