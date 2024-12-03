@@ -106,7 +106,7 @@ export default function CartPage() {
       setItemsTemp(items)
     }
   }, [isLoading]);
-
+  
   return (
     <main>
       <Container>
@@ -231,13 +231,13 @@ export default function CartPage() {
                   <strong>Total:</strong>
                   <strong>{convertToPhCurrency(calculateTotal() + 50)}</strong>
                 </div>
-                <Link href={{
+                <Link className={calculateTotal() <= 0 && 'pe-none'} href={{
                   pathname: '/checkout',
                   query: {
                     amount: calculateTotal() + 50
                   }
                 }}>
-                  <Button color="primary" block className="my-3">
+                  <Button disabled={calculateTotal() <= 0} color="primary" block className="my-3">
                     Checkout
                   </Button>
                 </Link>
