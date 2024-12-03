@@ -85,9 +85,9 @@ export function Address({ context }) {
               <Button color="light" className="w-100" size="lg" onClick={() => setTab(10)}>+ Add a new address</Button>
             </>
             :
-            <div className="text-secondary">
-              <h3>There are no addresses saved.</h3>
-              <p>Please add an address above</p>
+            <div className="text-secondary m-3">
+              <h3>There are no addresses saved</h3>
+              <p>You can add an address when you buy an item.</p>
             </div>
         }
       </div>

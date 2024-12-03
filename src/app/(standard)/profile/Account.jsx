@@ -19,7 +19,7 @@ export function Account({ context }) {
     <>
       <p className='fs-3'>Basic Information</p>
       <div className='d-flex justify-content-center mb-3'>
-        <img src={imageUrl} alt="" />
+        <img src={imageUrl} className='rounded' alt="" />
       </div>
       <h4 className='text-center mb-0'>{user.name.display}</h4>
       <p className='text-center text-secondary mb-4 mt-0'>Display Name</p>

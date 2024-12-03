@@ -24,7 +24,6 @@ export default function Page() {
 
   const [tab, setTab] = useState(0);
 
-
   return (
     <main className='bg-light text-dark'>
       <Container className='p-5'>
@@ -43,7 +42,7 @@ export default function Page() {
               <Button active={tab === 4} onClick={() => setTab(4)} className='text-start mt-2 text-secondary' block color='light'>CANCELLATIONS & REFUNDS</Button>
             </div>
           </Col>
-          <Col className='p-4 border my-3 rounded' style={{ background: 'white' }} md={8}>
+          <Col className='p-4 border my-3 rounded' style={{ background: 'white' }} md={9}>
             {
               !isLoading && (
                 <PageContext.Provider value={{ user, setTab, tab, mutate }}>
@@ -52,6 +51,7 @@ export default function Page() {
                   </div>
                   <div className={tab === 1 ? '' : 'd-none'}>
                     <p className='fs-3'>Privacy and Security</p>
+                    <p>To be implemented</p>
                   </div>
                   <div className={tab === 2 ? '' : 'd-none'}>
                     <Address context={PageContext}/>
@@ -61,6 +61,7 @@ export default function Page() {
                   </div>
                   <div className={tab === 4 ? '' : 'd-none'}>
                     <p className='fs-3'>Cancellation & Refunds (0)</p>
+                    <p>To be implemented</p>
                   </div>
                   <div className={tab === 10 ? '' : 'd-none'}>
                     <AddAddress context={PageContext}/>
