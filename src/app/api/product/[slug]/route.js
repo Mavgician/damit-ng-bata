@@ -116,7 +116,7 @@ export async function POST(req, { params }) {
           collection: collectionRef,
           orderByKey: body.orderBy,
           order: body.order,
-          limit: body.limit,
+          searchLimit: body.limit,
           firstDoc: body.firstDoc,
           lastDoc: body.lastDoc,
           filter: body.search
