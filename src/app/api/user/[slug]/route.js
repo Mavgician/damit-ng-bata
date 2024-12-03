@@ -1,5 +1,5 @@
 import { db } from '@/firebase-app-config.js'
-import { arrayUnion, collection, doc, getDoc, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, collection, doc, getDoc, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 
 import { fetchCollectionItems } from '@/api/fetch_functions'
@@ -57,7 +57,7 @@ export async function POST(req, { params }) {
     let updated
 
     try {
-        if (!userDocRaw.exists()) {
+        if (params.slug != 'add' && params.slug != 'update' && !userDocRaw.exists()) {
             return NextResponse.json({ message: 'User does not exist', authorized: false }, { status: 404 })
         }
 
@@ -125,6 +125,7 @@ export async function POST(req, { params }) {
                     locations: arrayUnion({
                         name: body.name,
                         phone: body.phone,
+                        active: false,
                         address: {
                             line1: body.address.line1,
                             line2: body.address.line2,
@@ -136,6 +137,11 @@ export async function POST(req, { params }) {
                     })
                 })
                 break
+
+            case 'remove-address':
+                await updateDoc(document, {
+                    locations: userDoc.locations.filter((_, idx) => idx != body.index)
+                })
 
             case 'get-address':
                 return NextResponse.json(userDoc.locations, { status: 200 })
