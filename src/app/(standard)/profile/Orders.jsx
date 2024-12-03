@@ -31,7 +31,7 @@ export function Orders() {
 
   return (
     <>
-      <p className='fs-3'>My Orders ({orders?.count ?? 0})</p>
+      <p className='fs-3 mb-2'>My Orders ({orders?.count ?? 0})</p>
       {
         !isOrdersLoading && !isReviewsLoading ?
           orders.count > 0 ?
@@ -125,7 +125,12 @@ export function Orders() {
               })}
             </>
             :
-            <div>There are no orders yet</div>
+            <div className="border rounded">
+              <div className="text-secondary m-3">
+                <h3>There are no orders yet</h3>
+                <p>You can see orders here when you buy an item.</p>
+              </div>
+            </div>
           :
           <div>Loading</div>
       }
