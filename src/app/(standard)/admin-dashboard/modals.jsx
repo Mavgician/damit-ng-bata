@@ -238,11 +238,102 @@ export function SetProduct({ context }) {
 }
 
 export function SetUser({ context }) {
-  /* const { modalData: data, setSubmitData } = useContext(context) */
+  const { modalData: data, setSubmitData } = useContext(context)
+
+  const [displayName, setDisplayName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [type, setType] = useState('user');
+  const [disabled, setDisabled] = useState(false);
+
+  useEffect(() => {
+    setDisplayName(data?.name.display ?? '')
+    setFirstName(data?.name.first ?? '')
+    setLastName(data?.name.last ?? '')
+    setEmail(data?.email ?? '')
+    setType(data?.type ?? 'user')
+  }, [data]);
+
+  useEffect(() => {
+    setSubmitData({
+      name: {
+        display: displayName,
+        last: lastName,
+        first: firstName,
+      },
+      type: type,
+      email: email,
+      id: data?.id ?? '',
+      isDisabled: disabled == 'True' ? true : false
+    })
+  }, [displayName, firstName, lastName, email, type]);
+
+  console.log(disabled);
+  
 
   return (
     <ModalFrame context={context} size="lg">
-
+      <div className={'text-muted-mb-3'}><b><p>Add User</p></b></div>
+      <Form>
+        <FormGroup>
+          <Label>Display Name</Label>
+          <Input value={displayName} onChange={e => setDisplayName(e.target.value)} />
+        </FormGroup>
+        <Row>
+          <Col>
+            <FormGroup>
+              <Label>First Name</Label>
+              <Input value={firstName} onChange={e => { setFirstName(e.target.value) }} />
+            </FormGroup>
+          </Col>
+          <Col>
+            <FormGroup>
+              <Label>Last Name</Label>
+              <Input value={lastName} onChange={e => { setLastName(e.target.value) }} />
+            </FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <FormGroup>
+              <Label>Email</Label>
+              <Input value={email} onChange={e => { setEmail(e.target.value) }} />
+            </FormGroup>
+          </Col>
+          <Col></Col>
+        </Row>
+        <Row>
+          <Col>
+            <FormGroup>
+              <Label>Account Type</Label>
+              <Input
+                placeholder='Genre'
+                type='select'
+                value={type}
+                onChange={e => { setType(e.target.value) }}
+              >
+                <option>user</option>
+                <option>admin</option>
+              </Input>
+            </FormGroup>
+          </Col>
+          <Col>
+            <FormGroup>
+              <Label>Is Disabled</Label>
+              <Input
+                placeholder='Genre'
+                type='select'
+                value={disabled}
+                onChange={e => { setDisabled(e.target.value) }}
+              >
+                <option>True</option>
+                <option>False</option>
+              </Input>
+            </FormGroup>
+          </Col>
+        </Row>
+      </Form>
     </ModalFrame>
   )
 }

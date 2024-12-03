@@ -38,16 +38,16 @@ export default function Page() {
   return (
     <main className='bg-light text-dark'>
       <Container className='p-5' fluid>
-        <h1>Admin Dashboard</h1>
         <Row>
-          <Col xs={12} s={12} md={2} lg={2}>
-            <div className='my-3'>
+          <Col md={2}>
+            <div className='p-4 border my-3 rounded' style={{ background: 'white' }}>
+              <h2 className='mb-4'>Admin Dashboard</h2>
               <Button active={tab === 0} onClick={() => setTab(0)} className='text-start text-secondary' block color='light'>OVERVIEW</Button>
               <Button active={tab === 1} onClick={() => setTab(1)} className='text-start mt-2 text-secondary' block color='light'>ACCOUNTS</Button>
               <Button active={tab === 2} onClick={() => setTab(2)} className='text-start mt-2 text-secondary' block color='light'>PRODUCTS</Button>
             </div>
           </Col>
-          <Col xs={12} s={12} md={10} lg={10}>
+          <Col className='p-4 border my-3 rounded' style={{ background: 'white' }} md={10}>
             <div className={tab === 0 ? '' : 'd-none'}>
               <h4 className='m-0'>Overview</h4>
               <h5 className='text-secondary'>Statistics here</h5>
@@ -161,10 +161,10 @@ function AdminModule({ children, url }) {
     )
   }
 
-  return <AdminTableData.Provider value={providerValue}>{children}</AdminTableData.Provider>
+  return <AdminTableData.Provider value={providerValue}><div className='border rounded'>{children}</div></AdminTableData.Provider>
 }
 
-function TableControls({ setLimit, setOrderBy, next, prev, children }) {
+function TableControls({ setLimit, setOrderBy, next, prev, children, noAdd = false }) {
   const { data, pageNumber, maxPage, setIsOpen, isOpen, setModalData, setSubmitType, limit, orderBy } = useContext(AdminTableData)
 
   function addItem() {
@@ -190,9 +190,9 @@ function TableControls({ setLimit, setOrderBy, next, prev, children }) {
 
   return (
     <>
-      <div className="d-flex align-items-center bg-dark text-light p-3">
+      <div className="d-flex align-items-center p-3">
         <h4 className='m-0'>{children}</h4>
-        <Button className='ms-3' onClick={addItem}> Add + </Button>
+        { !noAdd && <Button className='ms-3' onClick={addItem}> Add + </Button> }
         <div className='d-flex flex-grow-1 justify-content-end align-items-center'>
           <div className='d-flex align-items-center gap-2 me-3'>
             <p className="m-0">Show</p>
@@ -217,7 +217,7 @@ function TableControls({ setLimit, setOrderBy, next, prev, children }) {
                 onChange={(e) => { handleOrderBy({ sort: e.target.value }) }}
                 value={sort}
               >
-                <option value={'id'}>ID</option>
+                <option value={'__name__'}>ID</option>
                 <option value={'creation'}>Creation</option>
                 <option value={'last_modified'}>Last Modified</option>
                 <option value={'name'}>Name</option>
@@ -238,8 +238,8 @@ function TableControls({ setLimit, setOrderBy, next, prev, children }) {
             </div>
           </div>
           <p className='m-0' style={{ fontSize: '0.8em' }}>Page {pageNumber + 1} of {maxPage}</p>
-          <Button color='dark' className={'ms-1'} onClick={() => prev(data)}>&lt;</Button>
-          <Button color='dark' className={'ms-1'} onClick={() => next(data)}>&gt;</Button>
+          <Button color='light' className={'ms-1'} onClick={() => prev(data)}>&lt;</Button>
+          <Button color='light' className={'ms-1'} onClick={() => next(data)}>&gt;</Button>
         </div>
       </div>
     </>
@@ -253,13 +253,49 @@ function Accounts() {
     next,
     prev,
     data: users,
-    setIsOpen
+    setIsOpen,
+    setModalData,
+    setSubmitfunc,
+    submitData,
+    setSubmitType,
+    submitType,
+    refetch,
+    isSubmitLoading,
+    setIsSubmitLoading
   } = useContext(AdminTableData)
+
+  async function submit(data, type) {
+    if (isSubmitLoading) return
+
+    setIsSubmitLoading(true)
+
+    await fetch(
+      `api/user/${type}`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }
+    )
+
+    setIsOpen(false)
+    setIsSubmitLoading(false)
+    await refetch()
+  }
+
+  function edit(data) {
+    setModalData(data)
+    setIsOpen(true)
+    setSubmitType('update')
+  }
+
+  useEffect(() => {
+    setSubmitfunc(() => () => { submit(submitData, submitType) })
+  }, [submitData, submitType]);
 
   return (
     <>
       <SetUser context={AdminTableData} />
-      <TableControls setLimit={setLimit} setOrderBy={setOrderBy} next={next} prev={prev}>
+      <TableControls setLimit={setLimit} setOrderBy={setOrderBy} next={next} prev={prev} noAdd>
         Manage User Accounts
       </TableControls>
       <Table hover responsive className='p-3'>
@@ -298,14 +334,8 @@ function Accounts() {
                 </td>
                 <td className='text-muted'>
                   <div className="d-flex">
-                    <Button outline color='danger' size='sm' className='mx-1' onClick={() => { setIsOpen(false) }}>
-                      <FontAwesomeIcon icon={faTrash} />
-                    </Button>
-                    <Button outline color='primary' size='sm' className='mx-1' onClick={() => { setIsOpen(false) }}>
+                    <Button outline color='primary' size='sm' className='mx-1' onClick={() => { edit(data) }}>
                       <FontAwesomeIcon icon={faPen} />
-                    </Button>
-                    <Button outline color='success' size='sm' className='mx-1' onClick={() => { setIsOpen(false) }}>
-                      View Orders
                     </Button>
                   </div>
                 </td>
