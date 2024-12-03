@@ -6,9 +6,11 @@ import { NextResponse } from 'next/server';
 
 import { fetchCollectionItems } from '../../fetch_functions'
 
-export async function GET() {
+export async function POST(req) {
   try {
     const { uid } = await getUserSS()
+    const { id } = await req.json()
+
     const document = await fetchCollectionItems({
       collection: collection(db, 'orders'),
       orderByKey: 'creation',
@@ -18,7 +20,7 @@ export async function GET() {
         {
           field: 'customer_ref',
           operator: '==',
-          searchterm: doc(db, 'users', uid)
+          searchterm: doc(db, 'users', id ?? uid)
         },
         {
           field: 'status',
