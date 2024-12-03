@@ -5,7 +5,6 @@ import {
   Row,
   Col,
   Button,
-  Spinner,
   Carousel,
   CarouselItem,
   CarouselControl,

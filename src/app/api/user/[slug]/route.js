@@ -1,5 +1,5 @@
 import { db } from '@/firebase-app-config.js'
-import { arrayRemove, arrayUnion, collection, doc, getDoc, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import { arrayUnion, collection, doc, getDoc, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 
 import { fetchCollectionItems } from '@/api/fetch_functions'
