@@ -34,7 +34,8 @@ async function init(req) {
             },
             orders: [],
             reviews: [],
-            type: 'user'
+            type: 'user',
+            isDisabled: false
         }
     } catch {
         console.warn('User data cannot be set.')
@@ -67,14 +68,10 @@ export async function POST(req, { params }) {
                 break;
 
             case 'update':
-                updated = {
-                    ...userDoc,
-                    name: {
-                        ...newUserdata.name
-                    }
-                }
+                const target_ref = doc(db, 'users', body.id)
+                delete body.id
 
-                await setDoc(document, updated)
+                await updateDoc(target_ref, {last_modified: Timestamp.now(), ...body})
                 break;
 
             case 'verify':
@@ -87,7 +84,7 @@ export async function POST(req, { params }) {
                         collection: collectionRef,
                         orderByKey: body.orderBy,
                         order: body.order,
-                        limit: body.limit,
+                        searchLimit: body.limit,
                         firstDoc: body.firstDoc,
                         lastDoc: body.lastDoc,
                         filter: body.search
