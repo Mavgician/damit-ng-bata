@@ -22,7 +22,15 @@ const ADMIN_PATHS = [
 const rule = new RegExp(options.allowRule)
 
 export const config = {
-    matcher: ['/login:path*', '/admin-dashboard:path*', '/cart:path*', '/profile:path*', '/register/:path*', '/checkout:path*', '/checkout-success:path*'],
+    matcher: [
+        '/login:path*',
+        '/admin-dashboard:path*',
+        '/cart:path*',
+        '/profile:path*',
+        '/register/:path*',
+        '/checkout:path*',
+        '/checkout-success:path*',
+    ],
 }
 
 export default async function middleware(req) {
@@ -50,6 +58,10 @@ export default async function middleware(req) {
                 })
             }
         )
+
+        if (user.isDisabled) {
+            return NextResponse.redirect(new URL('/account-disabled', req.nextUrl))
+        }
 
         const isAdmin = user?.type == 'admin'
         console.info('User is admin: ' + isAdmin)
