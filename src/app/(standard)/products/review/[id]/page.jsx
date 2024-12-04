@@ -46,7 +46,7 @@ export default function Page({ params }) {
   const router = useRouter()
 
   async function submitHandler() {
-    fetch('/api/review/create', {
+    await fetch('/api/review/create', {
       method: 'POST',
       body: JSON.stringify({
         product_id: params.id,
