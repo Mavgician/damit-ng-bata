@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Col, Container, Row } from "reactstrap"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import useSWR from "swr"
 import { fetchParsed } from "@/src/lib/fetch-parsed"
 

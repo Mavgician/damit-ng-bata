@@ -1,5 +1,5 @@
 import { db } from '@/firebase-app-config.js'
-import { collection, doc, getDoc, getDocs, query } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 
 import { NextResponse } from 'next/server';
 

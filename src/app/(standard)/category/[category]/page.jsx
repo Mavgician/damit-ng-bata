@@ -1,7 +1,5 @@
 'use client';
 
-import { convertToPhCurrency } from '@/lib/convertToPHCurrency'
-
 import {
   Container,
   Row,
@@ -17,7 +15,6 @@ import Link from 'next/link'
 import useSWR from 'swr'
 
 import Skeleton from 'react-loading-skeleton';
-import { RateButton } from '@/components/RateButton';
 import { ProductCard } from '@/src/components/ProductCard';
 
 export default function Page({ params }) {
