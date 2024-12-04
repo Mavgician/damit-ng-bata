@@ -171,6 +171,11 @@ export function Navigationbar({ isFixed = true }) {
                         Girls
                       </NavLink>
                     </DropdownItem>
+                    <DropdownItem>
+                      <NavLink href={'/category/unisex'}>
+                        Unisex
+                      </NavLink>
+                    </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
               </NavItem>
