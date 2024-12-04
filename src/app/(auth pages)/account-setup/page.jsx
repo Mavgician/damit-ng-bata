@@ -35,10 +35,7 @@ export default function Page() {
 
     setIsCreated(true)
 
-    await fetch('api/user/add', { method: 'POST' })
-
-    await fetch(
-      'api/user/update',
+    await fetch('api/user/add',
       {
         method: 'POST',
         body: JSON.stringify({
