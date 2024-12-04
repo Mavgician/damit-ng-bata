@@ -108,7 +108,7 @@ function ProfilePopup({ user, firestoreUser }) {
               </div>
               Profile
             </NavLink>
-            <NavLink href='/settings' className='px-3 py-2 profilePopoverLink'>
+            <NavLink href='/profile' className='px-3 py-2 profilePopoverLink'>
               <div className='profilePopoverMenu'>
                 <FontAwesomeIcon style={icon} icon={faGear} />
               </div>

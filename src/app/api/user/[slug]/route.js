@@ -91,10 +91,8 @@ export async function POST(req, { params }) {
                     })
 
                     return NextResponse.json(items, { status: 200 })
-                } else if (userDoc.type !== 'admin') {
-                    return NextResponse.json({ error: 'Cannot fetch user list. User lacks permission.' }, { status: 401 })
                 } else {
-                    return NextResponse.json({ error: 'User not logged in.' }, { status: 401 })
+                    return NextResponse.json({ error: 'Cannot fetch user list. User lacks permission.' }, { status: 401 })
                 }
 
             case 'cart':

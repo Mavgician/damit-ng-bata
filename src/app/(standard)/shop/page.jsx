@@ -21,6 +21,8 @@ import useSWR from 'swr'
 import { useState, useEffect } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
+import { ProductCard } from '@/components/ProductCard'
+
 import Skeleton from 'react-loading-skeleton';
 
 export default function Page() {
@@ -37,22 +39,49 @@ export default function Page() {
   const [searchParams, setSearchParams] = useState([]);
   const [loader, setLoader] = useState(false);
 
+  const [firstDoc, setFirstDoc] = useState();
+  const [lastDoc, setLastDoc] = useState();
+  const [pageNumber, setPageNumber] = useState(0);
+
+  const limit = 8
+
   const setSearchDebounced = useDebouncedCallback(
     (params) => {
       setSearchParams(params)
     }, 1000
   )
 
-  const { data: product, isLoading, mutate } = useSWR(['api/product/list', orderby, searchParams],
-    ([url, order, search]) => fetchParsed(url, {
+  const { data: product, isLoading, mutate } = useSWR(['api/product/list', orderby, searchParams, limit, firstDoc, lastDoc],
+    ([url, order, search, limit, firstDoc, lastDoc]) => fetchParsed(url, {
       method: 'POST',
       body: JSON.stringify({
         orderBy: order.key,
         order: order.order,
-        limit: 16,
+        limit: limit,
+        firstDoc, lastDoc,
         search: search
       })
     }))
+
+  const maxPage = isNaN(Math.ceil(product?.count / limit)) ? 0 : Math.ceil(product?.count / limit)
+
+  const next = () => {
+    if (pageNumber + 1 == maxPage) return
+
+    setLastDoc(product.data[limit - 1].id)
+    setFirstDoc(undefined)
+
+    setPageNumber(pageNumber + 1)
+  }
+
+  const prev = () => {
+    if (pageNumber <= 0) return
+
+    setFirstDoc(product.data[0].id)
+    setLastDoc(undefined)
+
+    setPageNumber(pageNumber - 1)
+  }
 
   function searchHandler() {
     setSearchDebounced.flush()
@@ -118,7 +147,7 @@ export default function Page() {
   }, [product]);
 
   return (
-    <main className='row bg-light'>
+    <main className='row bg-light pb-5 mb-5'>
       <Col md={3} className='position-relative p-0'>
         <div className='position-sticky w-100 end-0 ps-5 py-4' style={{ top: 56 }}>
           <div className='border border p-4 rounded' style={{ background: 'white' }}>
@@ -168,7 +197,6 @@ export default function Page() {
                 </div>
               </FormGroup>
               <div className="d-flex gap-2 justify-content-end">
-                <Button color='danger'>Clear</Button>
                 <Button color='success' onClick={() => { searchHandler(productName) }}>Search</Button>
               </div>
             </Form>
@@ -183,17 +211,24 @@ export default function Page() {
               &gt;
               <Link className='text-reset text-decoration-none' href={'/shop'}>Shop</Link>
             </div>
-            {
-              isLoading || loader ?
-                <h1 className="mb-4" style={{ fontSize: '2em' }}><Skeleton /></h1>
-                :
-                product?.data.length > 0 ?
-                  <p className='mb-4' style={{ fontSize: '2em' }}>Showing {product.count} result/s {hasNameSearch ? `for "${ghostName}" in category: ${category}` : `for category: ${category}`}</p>
+              {
+                isLoading || loader ?
+                  <h1 style={{ fontSize: '2em' }}><Skeleton /></h1>
                   :
-                  <>
-                    <p className='mb-4' style={{ fontSize: '2em' }}>Showing no results {hasNameSearch ? `for "${ghostName}" in category: ${category}` : `for category: ${category}`}</p>
-                  </>
-            }
+                  product?.data.length > 0 ?
+                    <div className="d-flex mb-4 align-items-center">
+                      <p className='m-0' style={{ fontSize: '2em' }}>Showing {product.count} result/s {hasNameSearch ? `for "${ghostName}" in category: ${category}` : `for category: ${category}`}</p>
+                      <div className='d-flex align-items-center border rounded ms-auto ps-3'>
+                        Page {pageNumber + 1} of {maxPage}
+                        <Button color='light' className={'ms-1'} onClick={() => prev(product)}>&lt;</Button>
+                        <Button color='light' className={'ms-1'} onClick={() => next(product)}>&gt;</Button>
+                      </div>
+                    </div>
+                    :
+                    <>
+                      <p className='m-0 mb-4' style={{ fontSize: '2em' }}>Showing no results {hasNameSearch ? `for "${ghostName}" in category: ${category}` : `for category: ${category}`}</p>
+                    </>
+              }
             <Row>
               {
                 isLoading || loader ?
@@ -209,30 +244,7 @@ export default function Page() {
                   )
                   :
                   product.data.length > 0 && product.data.map((product, idx) => (
-                    <Col md={3} key={idx} className='p-2'>
-                      <div className='rounded border p-3' style={{ background: 'white' }}>
-                        <Link
-                          className='text-reset text-decoration-none'
-                          href={{
-                            pathname: `/products/${product.id}`,
-                            query: { category: product.category }
-                          }}
-                        >
-                          <div className="product-item">
-                            <div className='d-flex align-items-center justify-content-center product-image'>
-                              <img src={product.thmburl.url} alt={product.thmburl.id} />
-                            </div>
-                            <h5 className='text-truncate'>{product.name.join(' ')}</h5>
-                            <div className='flex-grow-1 d-flex justify-content-end'>
-                              stars
-                            </div>
-                            <div className="d-flex">
-                              <h5>{convertToPhCurrency(product.price)}</h5>
-                            </div>
-                          </div>
-                        </Link>
-                      </div>
-                    </Col>
+                    <ProductCard data={product} key={idx}/>
                   ))
               }
             </Row>

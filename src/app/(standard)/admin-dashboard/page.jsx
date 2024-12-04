@@ -33,7 +33,7 @@ const AdminTableData = createContext(null)
 const ConfirmModalContext = createContext(null)
 
 export default function Page() {
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState();
 
   return (
     <main className='bg-light text-dark'>
@@ -42,7 +42,7 @@ export default function Page() {
           <Col md={2}>
             <div className='p-4 border my-3 rounded' style={{ background: 'white' }}>
               <h2 className='mb-4'>Admin Dashboard</h2>
-              <Button active={tab === 0} onClick={() => setTab(0)} className='text-start text-secondary' block color='light'>OVERVIEW</Button>
+              {/* <Button active={tab === 0} onClick={() => setTab(0)} className='text-start text-secondary' block color='light'>OVERVIEW</Button> */}
               <Button active={tab === 1} onClick={() => setTab(1)} className='text-start mt-2 text-secondary' block color='light'>ACCOUNTS</Button>
               <Button active={tab === 2} onClick={() => setTab(2)} className='text-start mt-2 text-secondary' block color='light'>PRODUCTS</Button>
             </div>

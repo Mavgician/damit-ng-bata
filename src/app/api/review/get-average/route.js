@@ -11,7 +11,9 @@ export async function POST(req) {
     const q = query(collection(db, 'reviews'), where('product_ref', '==', doc(db, 'products', id)))
     const avg_rating = await getAggregateFromServer(q, {rating: average('rating')})
 
-    return NextResponse.json({ average: avg_rating.data().rating }, { status: 200 })
+    
+
+    return NextResponse.json({ average: avg_rating.data().rating ?? 0 }, { status: 200 })
 
   } catch (error) {
     console.warn(error)

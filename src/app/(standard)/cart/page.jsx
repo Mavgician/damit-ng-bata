@@ -1,7 +1,7 @@
 'use client';
 
 import { fetchParsed } from '@/lib/fetch-parsed'
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
 import {
   Container,
   Row,
@@ -19,11 +19,16 @@ import Link from "next/link";
 
 import { convertToPhCurrency } from '@/lib/convertToPHCurrency';
 import Skeleton from 'react-loading-skeleton';
+import { ConfirmationModal } from '@/src/components/modal_template';
+
+const CartContext = createContext(null)
 
 export default function CartPage() {
   const { data: pending_order, isLoading } = useSWR('api/order/get-all-pending', fetchParsed)
 
   const [itemsTemp, setItemsTemp] = useState([]);
+  const [isConfirm, setIsConfirm] = useState(false);
+  const [submitID, setSubmitID] = useState(null);
 
   const updateQuantity = (id, newQuantity) => {
     setItemsTemp(
@@ -106,9 +111,14 @@ export default function CartPage() {
       setItemsTemp(items)
     }
   }, [isLoading]);
-  
+
   return (
     <main>
+      <CartContext.Provider value={{ isOpen: isConfirm, setIsOpen: setIsConfirm, submit: () => {removeItem(submitID); setIsConfirm(false)}, cancel: () => setSubmitID(null)}}>
+        <ConfirmationModal context={CartContext}>
+          You will be removing a cart item.
+        </ConfirmationModal>
+      </CartContext.Provider>
       <Container>
         <Row className="my-4">
           <Col md="8">
@@ -160,7 +170,10 @@ export default function CartPage() {
                             <div className="d-flex justify-content-between mt-3">
                               <Button
                                 color="dark"
-                                onClick={() => removeItem(item.id)}
+                                onClick={() => {
+                                  setSubmitID(item.id)
+                                  setIsConfirm(true)
+                                }}
                                 className='px-5 py-2'
                               >
                                 Remove
