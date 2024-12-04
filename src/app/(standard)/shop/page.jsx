@@ -1,7 +1,5 @@
 'use client';
 
-import { convertToPhCurrency } from '@/lib/convertToPHCurrency'
-
 import {
   Container,
   Row,
