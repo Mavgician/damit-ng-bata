@@ -34,13 +34,13 @@ export default function Home() {
         <Container className='mb-5'>
           <Row>
             <Col md={6}>
-              <Link href='/'><img className='w-100 h-100' src="https://www.myperiwinkle.com/cdn/shop/files/4G1A6513.jpg?v=1728365013&width=1950" alt="" /></Link>
+              <Link href='/category/boys'><img className='w-100 h-100' src="https://images.pexels.com/photos/1094084/pexels-photo-1094084.jpeg" alt="" /></Link>
             </Col>
             <Col md={6}>
-              <Link href='/'><img className='w-100 h-100' src="https://www.myperiwinkle.com/cdn/shop/files/4G1A6513.jpg?v=1728365013&width=1950" alt="" /></Link>
+              <Link href='/category/girls'><img className='w-100 h-100' src="https://images.pexels.com/photos/3662845/pexels-photo-3662845.jpeg" alt="" /></Link>
             </Col>
             <Col className='my-3' md={12}>
-              <Link href='/'><img className='w-100 h-100' src="https://www.myperiwinkle.com/cdn/shop/files/4G1A6513.jpg?v=1728365013&width=1950" alt="" /></Link>
+              <Link href='/category/unisex'><img className='w-100 h-100' src="https://images.pexels.com/photos/301977/pexels-photo-301977.jpeg" alt="" /></Link>
             </Col>
           </Row>
         </Container>
