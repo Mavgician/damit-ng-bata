@@ -70,13 +70,15 @@ export default async function middleware(req) {
             return NextResponse.redirect(new URL('/account-setup', req.nextUrl));
         }
 
+        if (path != '/admin-dashboard' && isAdmin) {
+            return NextResponse.redirect(new URL('/admin-dashboard', req.nextUrl))
+        }
+
         if (AUTH_PATHS.includes(path)) {
             return NextResponse.redirect(new URL(target, req.nextUrl));
         }
 
-        if (ADMIN_PATHS.includes(path) && isAdmin) {
-            return NextResponse.next()
-        } else if (ADMIN_PATHS.includes(path) && !isAdmin) {
+        if (ADMIN_PATHS.includes(path) && !isAdmin) {
             return NextResponse.redirect(new URL('/not-allowed', req.nextUrl))
         }
 
