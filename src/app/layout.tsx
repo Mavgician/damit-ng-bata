@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { FirebaseNextJSProvider } from "firebase-nextjs/client/auth";
+import { Analytics } from "@vercel/analytics/react"
 
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -21,6 +22,7 @@ export default function RootLayout({
       <FirebaseNextJSProvider>
         <body>
           {children}
+          <Analytics/>
         </body>
       </FirebaseNextJSProvider>
     </html>
