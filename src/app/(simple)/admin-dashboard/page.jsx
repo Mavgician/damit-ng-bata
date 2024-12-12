@@ -33,7 +33,7 @@ const AdminTableData = createContext(null)
 const ConfirmModalContext = createContext(null)
 
 export default function Page() {
-  const [tab, setTab] = useState();
+  const [tab, setTab] = useState(0);
 
   return (
     <main className='bg-light text-dark'>
@@ -42,15 +42,15 @@ export default function Page() {
           <Col md={2}>
             <div className='p-4 border my-3 rounded' style={{ background: 'white' }}>
               <h2 className='mb-4'>Admin Dashboard</h2>
-              {/* <Button active={tab === 0} onClick={() => setTab(0)} className='text-start text-secondary' block color='light'>OVERVIEW</Button> */}
+              <Button active={tab === 0} onClick={() => setTab(0)} className='text-start text-secondary' block color='light'>OVERVIEW</Button>
               <Button active={tab === 1} onClick={() => setTab(1)} className='text-start mt-2 text-secondary' block color='light'>ACCOUNTS</Button>
               <Button active={tab === 2} onClick={() => setTab(2)} className='text-start mt-2 text-secondary' block color='light'>PRODUCTS</Button>
             </div>
           </Col>
           <Col className='p-4 border my-3 rounded' style={{ background: 'white' }} md={10}>
             <div className={tab === 0 ? '' : 'd-none'}>
-              <h4 className='m-0'>Overview</h4>
-              <h5 className='text-secondary'>Statistics here</h5>
+              <h4>Overview</h4>
+              
             </div>
             <div className={tab === 1 ? '' : 'd-none'}>
               <AdminModule url='api/user/list'><Accounts /></AdminModule>
