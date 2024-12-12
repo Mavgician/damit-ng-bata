@@ -33,13 +33,10 @@ export function Footer() {
             </Col>
             <Col md="2" lg="2" xl="2" className="mx-auto mb-4">
               <h6 className="text-uppercase fw-bold mb-4">Products</h6>
-              <Link href="/about-us" className="text-decoration-none d-block text-white">
-                About Us
-              </Link>
-              <Link href="/category/boys" className="text-decoration-none d-block text-white">
+              <Link className="text-decoration-none d-block text-white" href="/category/boys" >
                 Boys
               </Link>
-              <Link href="/category/girls" className="text-decoration-none d-block text-white">
+              <Link className="text-decoration-none d-block text-white" href="/category/girls" >
                 Girls
               </Link>
             </Col>
@@ -47,26 +44,32 @@ export function Footer() {
               <h6 className="text-uppercase fw-bold mb-4">
                 Useful links
               </h6>
-              <Link href="/profile" className="text-decoration-none d-block text-white">
+              <Link className="text-decoration-none d-block text-white" href="/profile">
                 Settings
               </Link>
-              <Link href="/profile" className="text-decoration-none d-block text-white">
+              <Link className="text-decoration-none d-block text-white" href="/profile">
                 Orders
               </Link>
             </Col>
             <Col md="4" lg="3" xl="3" className="mx-auto mb-md-0 mb-4">
-              <h6 className="text-uppercase fw-bold mb-4">Contact</h6>
-              <p>
-                <FontAwesomeIcon icon={faHome} className='me-2' /> New York, NY 10012, US
+              <h6 className="text-uppercase fw-bold mb-4">The Developers</h6>
+              <p className='m-0'>
+                <Link className="text-decoration-none d-block text-white" href={'https://www.facebook.com/mavs24/'}>Jon Maverick N. Cruz</Link>
+              </p>
+              <p className='m-0'>
+                <Link className="text-decoration-none d-block text-white" href={'https://www.facebook.com/ormidojm'}>John Mark B. Ormido</Link>
+              </p>
+              <p className='m-0'>
+                <Link className="text-decoration-none d-block text-white" href={'https://www.facebook.com/eddieanne.ricapor'}>Eddieanne C. Ricapor</Link>
               </p>
               <p>
-                <FontAwesomeIcon icon={faEnvelope} className='me-2' /> info@example.com
+                <Link className="text-decoration-none d-block text-white" href={'https://www.facebook.com/clarkeserrano11'}>King Clarke T. Serrano</Link>
               </p>
+              <h6 className="text-uppercase fw-bold">Contact Us</h6>
               <p>
-                <FontAwesomeIcon icon={faPhone} className='me-2' /> + 01 234 567 88
-              </p>
-              <p>
-                <FontAwesomeIcon icon={faPrint} className='me-2' /> + 01 234 567 89
+                <Link className="text-decoration-none d-block text-white" href="/about-us" >
+                  About Us
+                </Link>
               </p>
             </Col>
           </Row>
