@@ -50,7 +50,7 @@ export default function Page() {
           <Col className='p-4 border my-3 rounded' style={{ background: 'white' }} md={10}>
             <div className={tab === 0 ? '' : 'd-none'}>
               <h4>Overview</h4>
-              
+              Moved to Vercel Web Analytics.
             </div>
             <div className={tab === 1 ? '' : 'd-none'}>
               <AdminModule url='api/user/list'><Accounts /></AdminModule>
