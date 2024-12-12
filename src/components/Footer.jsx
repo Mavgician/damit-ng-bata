@@ -1,12 +1,4 @@
 'use client'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import {
-  faEnvelope,
-  faHome,
-  faPhone,
-  faPrint
-} from '@fortawesome/free-solid-svg-icons';
 
 import {
   Container,
