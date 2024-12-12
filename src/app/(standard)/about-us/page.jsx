@@ -12,7 +12,7 @@ export default function Page() {
         <Row>
           <Col md={3}>
             <Card>
-              <img src="https://res.cloudinary.com/damit-ng-bata/image/upload/v1733999995/authors/Edd.png" alt="" className="mb-3" />
+              <img src="https://res.cloudinary.com/damit-ng-bata/image/upload/v1733999995/authors/Maverick.png" alt="" className="mb-3" />
               <CardTitle tag={'h5'} className="text-center">
                 Jon Maverick N. Cruz
               </CardTitle>
