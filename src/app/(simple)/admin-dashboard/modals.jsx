@@ -324,7 +324,7 @@ export function SetUser({ context }) {
               <Input
                 placeholder='Genre'
                 type='select'
-                value={disabled}
+                value={`${disabled.toString().charAt(0).toUpperCase() + disabled.toString().slice(1)}`}
                 onChange={e => { setDisabled(e.target.value) }}
               >
                 <option>True</option>
